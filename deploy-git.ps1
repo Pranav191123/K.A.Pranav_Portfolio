@@ -4,7 +4,7 @@
 # ==============================================================================
 
 param(
-    [string]$RepoUrl = ""
+    [string]$RepoUrl = "https://github.com/Pranav191123/Pranav-Portfolio-2.git"
 )
 
 $gitExe = "git"
