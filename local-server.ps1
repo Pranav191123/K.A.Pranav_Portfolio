@@ -1,5 +1,5 @@
 $port = 8080
-$path = "C:\Users\KarampudiAcharyaPran\Desktop\high-profile-portfolio"
+$path = $PSScriptRoot
 
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://localhost:$port/")

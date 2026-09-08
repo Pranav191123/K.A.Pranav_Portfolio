@@ -1,6 +1,6 @@
 /* ============================================================================
    KARAMPUDI ACHARYA PRANAV — PORTFOLIO APP.JS
-   HD Anime Sword Engine · Light/Dark Theme · Accent Color Switcher
+   3D Gear Animation Engine · Crimson/Obsidian Theme · Interactive Mechanical UI
    ============================================================================ */
 
 'use strict';
@@ -10,20 +10,16 @@
 // ===========================================================================
 const APP = {
   theme:          'dark',
-  accent:         'cyan',
   audioEnabled:   false,
-  activeSword:    'all',
+  activeGearType: 'all',
   cmdPaletteOpen: false,
   modalOpen:      false,
-  swords:         [],
-  particles:      [],
+  gears:          [],
   animFrameId:    null,
   ctx:            null,
   canvas:         null,
   W:              0,
   H:              0,
-  scrollY:        0,
-  mouse:          { x: 0, y: 0 },
 };
 
 // ===========================================================================
@@ -35,7 +31,6 @@ const lerp = (a, b, t) => a + (b - a) * t;
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const rnd  = (min, max) => Math.random() * (max - min) + min;
 const rndInt = (min, max) => Math.floor(rnd(min, max + 1));
-const TAU = Math.PI * 2;
 
 function debounce(fn, delay) {
   let t;
@@ -45,7 +40,7 @@ function debounce(fn, delay) {
 // ===========================================================================
 // TOAST NOTIFICATIONS
 // ===========================================================================
-function showToast(msg, icon = '⚔️', duration = 2800) {
+function showToast(msg, icon = '⚙️', duration = 2800) {
   const container = $('#toast-container');
   const toast = document.createElement('div');
   toast.className = 'toast';
@@ -58,7 +53,7 @@ function showToast(msg, icon = '⚔️', duration = 2800) {
 }
 
 // ===========================================================================
-// THEME SYSTEM (Dark / Light)
+// THEME SYSTEM (Dark / Light — no palette picker)
 // ===========================================================================
 function applyTheme(theme) {
   APP.theme = theme;
@@ -67,57 +62,22 @@ function applyTheme(theme) {
   const sunIcon  = $('#theme-sun-icon');
   const moonIcon = $('#theme-moon-icon');
   if (theme === 'dark') {
-    if (sunIcon)  sunIcon.style.display  = '';
-    if (moonIcon) moonIcon.style.display = 'none';
+    sunIcon.style.display  = '';
+    moonIcon.style.display = 'none';
   } else {
-    if (sunIcon)  sunIcon.style.display  = 'none';
-    if (moonIcon) moonIcon.style.display = '';
+    sunIcon.style.display  = 'none';
+    moonIcon.style.display = '';
   }
+  // Rebuild gears for new theme
+  if (APP.gears.length) buildGearScene();
 }
 
 function initTheme() {
   const saved = localStorage.getItem('kap-theme') || 'dark';
   applyTheme(saved);
-  const btn = $('#theme-toggle-btn');
-  if (btn) {
-    btn.addEventListener('click', () => {
-      const next = APP.theme === 'dark' ? 'light' : 'dark';
-      applyTheme(next);
-      showToast(next === 'dark' ? 'Dark mode active' : 'Light mode active', '🌓');
-    });
-  }
-}
-
-// ===========================================================================
-// ACCENT COLOR SWITCHER
-// ===========================================================================
-const ACCENT_LABELS = {
-  cyan:    'Blueprint Cyan',
-  amber:   'Industrial Amber',
-  crimson: 'Getsuga Crimson',
-  purple:  'Ryuo Purple',
-  emerald: 'Precision Emerald',
-};
-
-function applyAccent(accent) {
-  APP.accent = accent;
-  document.documentElement.setAttribute('data-accent', accent);
-  localStorage.setItem('kap-accent', accent);
-  $$('.accent-dot').forEach(dot => {
-    dot.classList.toggle('active', dot.dataset.accent === accent);
-  });
-}
-
-function initAccentPicker() {
-  const savedAccent = localStorage.getItem('kap-accent') || 'crimson';
-  applyAccent(savedAccent);
-  $$('.accent-dot').forEach(dot => {
-    dot.addEventListener('click', () => {
-      const a = dot.dataset.accent;
-      applyAccent(a);
-      showToast(`Accent: ${ACCENT_LABELS[a] || a}`, '🎨');
-      playHaptic('click');
-    });
+  $('#theme-toggle-btn').addEventListener('click', () => {
+    applyTheme(APP.theme === 'dark' ? 'light' : 'dark');
+    showToast(APP.theme === 'dark' ? 'Dark mode active' : 'Light mode active', '🌓');
   });
 }
 
@@ -129,9 +89,9 @@ function initNavbar() {
   const navLinks = $$('.nav-link');
 
   window.addEventListener('scroll', debounce(() => {
-    APP.scrollY = window.scrollY;
     navbar.classList.toggle('scrolled', window.scrollY > 40);
 
+    // Active section highlight
     const sections = $$('section[id], div[id]');
     let current = '';
     sections.forEach(s => {
@@ -165,13 +125,13 @@ function initMobileDrawer() {
 }
 
 // ===========================================================================
-// AUDIO HAPTICS
+// AUDIO HAPTICS TOGGLE
 // ===========================================================================
 function initAudio() {
-  const btn        = $('#audio-toggle-btn');
-  const iconMuted  = $('#audio-icon-muted');
+  const btn       = $('#audio-toggle-btn');
+  const iconMuted = $('#audio-icon-muted');
   const iconActive = $('#audio-icon-active');
-  if (!btn) return;
+
   btn.addEventListener('click', () => {
     APP.audioEnabled = !APP.audioEnabled;
     iconMuted.style.display  = APP.audioEnabled ? 'none' : '';
@@ -182,1055 +142,604 @@ function initAudio() {
 
 function playHaptic(type = 'click') {
   if (!APP.audioEnabled) return;
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    const map = { click: [600, 0.02, 'sine'], success: [880, 0.05, 'sine'], error: [200, 0.05, 'sawtooth'] };
-    const [freq, dur, type_] = map[type] || map.click;
-    osc.type = type_;
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0.08, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + dur);
-  } catch(e) {}
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  const map = { click: [600, 0.02, 'sine'], success: [880, 0.05, 'sine'], error: [200, 0.05, 'sawtooth'] };
+  const [freq, dur, type_] = map[type] || map.click;
+  osc.type = type_;
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0.08, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + dur);
 }
 
 // ===========================================================================
-// HD ANIME SWORD ENGINE
+// 3D GEAR ANIMATION ENGINE (WebGL via Three.js)
 // ===========================================================================
 
-/* --------------------------------------------------------------------------
-   Sword definitions — each has physics params + draw function
-   -------------------------------------------------------------------------- */
-const SWORD_DEFS = [
-  {
-    id:    'ichigo',
-    label: 'Tensa Zangetsu',
-    char:  'Ichigo',
-    emoji: '🌑',
-    // Canvas drawing function — receives (ctx, params)
-    draw: drawIchigo,
-    // Colors used in particle effects
-    particleColors: ['#ef4444','#dc2626','#991b1b','#fca5a5','#ff6b6b'],
-    auraColor: 'rgba(239,68,68,0.35)',
-  },
-  {
-    id:    'kusanagi',
-    label: 'Kusanagi',
-    char:  'Sasuke',
-    emoji: '⚡',
-    draw: drawKusanagi,
-    particleColors: ['#60a5fa','#3b82f6','#a78bfa','#c4b5fd','#e0f2fe'],
-    auraColor: 'rgba(96,165,250,0.30)',
-  },
-  {
-    id:    'wado',
-    label: 'Wado Ichimonji',
-    char:  'Zoro',
-    emoji: '🤍',
-    draw: drawWado,
-    particleColors: ['#e2e8f0','#94a3b8','#67e8f9','#a5f3fc','#f0f9ff'],
-    auraColor: 'rgba(148,163,184,0.28)',
-  },
-  {
-    id:    'kitetsu',
-    label: 'Sandai Kitetsu',
-    char:  'Zoro',
-    emoji: '🔴',
-    draw: drawKitetsu,
-    particleColors: ['#f87171','#ef4444','#dc2626','#fbbf24','#fca5a5'],
-    auraColor: 'rgba(248,113,113,0.32)',
-  },
-  {
-    id:    'enma',
-    label: 'Enma',
-    char:  'Zoro',
-    emoji: '🟣',
-    draw: drawEnma,
-    particleColors: ['#c084fc','#a855f7','#7c3aed','#e9d5ff','#d8b4fe'],
-    auraColor: 'rgba(192,132,252,0.30)',
-  },
-];
+let threeScene, threeCamera, threeRenderer;
+let gearGroup = new THREE.Group();
+let clock = new THREE.Clock();
+let activeGearMesh = null;
+let bgGearMeshes = [];
 
-/* --------------------------------------------------------------------------
-   Particle system
-   -------------------------------------------------------------------------- */
-function spawnParticle(x, y, colors, auraColor) {
-  const count = rndInt(1, 3);
-  for (let i = 0; i < count; i++) {
-    APP.particles.push({
-      x, y,
-      vx: rnd(-1.4, 1.4),
-      vy: rnd(-2.8, -0.6),
-      life: 1.0,
-      decay: rnd(0.012, 0.025),
-      size: rnd(1.5, 4.5),
-      color: colors[rndInt(0, colors.length - 1)],
-      spin: rnd(-0.15, 0.15),
+/* --- Gear type definitions ------------------------------------------------ */
+const GEAR_TYPES = {
+  spur: { 
+    label: 'Spur Gear', teeth: { min: 12, max: 28 }, depth: 2.2,
+    specs: {
+      "Desired Gear Ratio": "1",
+      "(al) Pressure Angle": "20.00°",
+      "(bt) Helix Angle": "0.00°",
+      "(CD) Center Distance": "90.00 mm",
+      "Helix Angle Direction": "Left",
+      "(r) Root Fillet": "0.20 mm",
+      "Gear Accuracy": "1",
+      "Total Unit Correction": "0",
+      "(DM) Mounting Hole Diameter": "20.00 mm",
+      "(b) Face Width": "30.00 mm",
+      "Power": "1000.000 W",
+      "Speed": "1000.000 rpm",
+      "Efficiency": "0.92",
+      "Size Factor For Contact": "1",
+      "Size Factor For Bending": "1"
+    }
+  },
+  bevel: { 
+    label: 'Bevel Gear', teeth: { min: 10, max: 20 }, depth: 2.8,
+    specs: {
+      "Desired Gear Ratio": "1",
+      "(al) Pressure Angle": "20.00°",
+      "(bt) Spiral Angle": "0.00°",
+      "(Si) Shaft Angle": "90.00°",
+      "Module": "3.00 mn",
+      "Spiral Angle Direction": "Left",
+      "Tooth Thickness Mod.": "0",
+      "No. of Teeth": "30",
+      "(DM) Mounting Hole": "20.00 mm",
+      "(b) Face Width": "22.00 mm",
+      "Power": "1000.000 W",
+      "Speed": "1000.000 rpm",
+      "Efficiency": "0.92"
+    }
+  },
+  helical: { 
+    label: 'Helical Gear', teeth: { min: 14, max: 24 }, depth: 2.0,
+    specs: {
+      "Desired Gear Ratio": "1",
+      "(al) Pressure Angle": "20.00°",
+      "(bt) Helix Angle": "21.59°",
+      "(CD) Center Distance": "90.00 mm",
+      "Helix Angle Direction": "Left",
+      "(r) Root Fillet": "0.20 mm",
+      "Gear Accuracy": "1",
+      "Total Unit Correction": "0",
+      "(DM) Mounting Hole": "20.00 mm",
+      "(b) Face Width": "30.00 mm",
+      "Power": "1000.000 W",
+      "Speed": "1000.000 rpm",
+      "Efficiency": "0.92"
+    }
+  },
+  planetary: { 
+    label: 'Planetary Gear', teeth: { min: 16, max: 30 }, depth: 2.4,
+    specs: {
+      "Sun Gear Teeth": "16",
+      "Planet Gear Teeth": "12",
+      "Ring Gear Teeth": "40",
+      "(al) Pressure Angle": "20.00°",
+      "(CD) Center Distance": "45.00 mm",
+      "Module": "3.00 mn",
+      "(b) Face Width": "25.00 mm",
+      "Power": "1000.000 W",
+      "Input Speed (Sun)": "1000.000 rpm",
+      "Efficiency": "0.94"
+    }
+  },
+  worm: { 
+    label: 'Worm Gear', teeth: { min: 20, max: 36 }, depth: 1.8,
+    specs: {
+      "Speed": "1000.000 rpm",
+      "Torque": "9.540 N-m",
+      "Efficiency": "0.92",
+      "Form of Worm": "Form - ZA",
+      "Diametral Quotient": "10",
+      "CD (mm)": "125",
+      "(df) Root Dia (Worm)": "48.94 mm",
+      "(df) Root Dia (Gear)": "171.82 mm",
+      "(Beta) Helix Angle": "21.59°",
+      "(Gamma) Lead Angle": "21.59°",
+      "(Rtr) Tip Relief Rad": "0.63 mm",
+      "(Rrr) Root Relief Rad": "1.26 mm",
+      "(b) Worm Gear Width": "41.79 mm",
+      "(Pa) Worm Axial Pitch": "19.58 mm",
+      "(L) Length of Worm": "91.21 mm",
+      "(Pz) Lead of Worm": "78.33 mm",
+      "Axial Tooth Thickness": "9.89 mm"
+    }
+  },
+};
+const GEAR_TYPE_KEYS = Object.keys(GEAR_TYPES);
+
+/* --- Materials (theme-aware) ---------------------------------------------- */
+function getMaterials(isActive) {
+  const isDark = APP.theme === 'dark';
+  
+  if (isActive) {
+    return new THREE.MeshStandardMaterial({
+      color: isDark ? 0xef4444 : 0xdc2626, // Crimson
+      metalness: 0.8,
+      roughness: 0.2,
+      emissive: isDark ? 0x4a0000 : 0x2a0000,
+      emissiveIntensity: 0.4
+    });
+  } else {
+    // Muted grey/purple tones
+    return new THREE.MeshStandardMaterial({
+      color: isDark ? 0x5a5566 : 0x74849b,
+      metalness: 0.6,
+      roughness: 0.5,
+      transparent: true,
+      opacity: isDark ? 0.4 : 0.6
     });
   }
 }
 
-function updateParticles() {
-  APP.particles = APP.particles.filter(p => p.life > 0);
-  APP.particles.forEach(p => {
-    p.x  += p.vx;
-    p.y  += p.vy;
-    p.vy += 0.04;  // gravity
-    p.life -= p.decay;
-    p.vx  *= 0.98;
-  });
-}
+/* --- Geometry Generator --------------------------------------------------- */
+function createGearGeometry(radius, teeth, depth, type) {
+  const shape = new THREE.Shape();
+  const innerRadius = radius * 0.7;
+  const holeRadius = radius * 0.25;
+  const toothDepth = radius * 0.15;
+  const numTeeth = teeth;
 
-function drawParticles(ctx) {
-  APP.particles.forEach(p => {
-    ctx.save();
-    ctx.globalAlpha = p.life * 0.85;
-    ctx.fillStyle = p.color;
-    ctx.shadowColor = p.color;
-    ctx.shadowBlur = 8;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.size * p.life, 0, TAU);
-    ctx.fill();
-    ctx.restore();
-  });
-}
+  const angleStep = (Math.PI * 2) / numTeeth;
 
-/* --------------------------------------------------------------------------
-   Sword object factory
-   -------------------------------------------------------------------------- */
-function createSword(defIndex, isHero) {
-  const def = SWORD_DEFS[defIndex];
-  const W = APP.W, H = APP.H;
+  for (let i = 0; i < numTeeth; i++) {
+    const angle = i * angleStep;
+    const nextAngle = (i + 1) * angleStep;
+    
+    const toothAngle = angleStep * 0.4; // width of tooth
+    const gapAngle = angleStep * 0.6;   // width of gap
 
-  // Position — hero sword floats in center-right area; others scatter
-  let x, y, scale, angle;
-  if (isHero) {
-    x     = W * rnd(0.58, 0.78);
-    y     = H * rnd(0.30, 0.70);
-    scale = clamp(Math.min(W, H) * 0.0013, 0.60, 1.20);
-    angle = rnd(-0.22, 0.22);
-  } else {
-    x     = rnd(W * 0.06, W * 0.94);
-    y     = rnd(H * 0.06, H * 0.94);
-    scale = clamp(Math.min(W, H) * rnd(0.0005, 0.0010), 0.25, 0.70);
-    angle = rnd(0, TAU);
+    // Start of tooth
+    if (i === 0) shape.moveTo(Math.cos(angle) * innerRadius, Math.sin(angle) * innerRadius);
+    else shape.lineTo(Math.cos(angle) * innerRadius, Math.sin(angle) * innerRadius);
+    
+    // Tooth profile
+    shape.lineTo(Math.cos(angle + toothAngle * 0.2) * radius, Math.sin(angle + toothAngle * 0.2) * radius);
+    shape.lineTo(Math.cos(angle + toothAngle * 0.8) * radius, Math.sin(angle + toothAngle * 0.8) * radius);
+    shape.lineTo(Math.cos(angle + toothAngle) * innerRadius, Math.sin(angle + toothAngle) * innerRadius);
+    
+    // Gap
+    shape.lineTo(Math.cos(nextAngle) * innerRadius, Math.sin(nextAngle) * innerRadius);
   }
 
-  return {
-    defIndex,
-    def,
-    x, y,
-    angle,
-    targetAngle:   angle,
-    driftAngle:    rnd(0, TAU),
-    driftSpeed:    rnd(0.004, 0.009),
-    driftRadius:   rnd(15, 45),
-    bobY:          rnd(0, TAU),
-    bobSpeed:      rnd(0.003, 0.007),
-    bobAmp:        isHero ? rnd(6, 14) : rnd(3, 8),
-    rotateSpeed:   rnd(-0.006, 0.006),
-    scale,
-    alpha:         isHero ? 1.0 : rnd(0.30, 0.65),
-    isHero,
-    pulseT:        rnd(0, TAU),
-    pulseSpeed:    rnd(0.025, 0.040),
-    particleTimer: 0,
-    particleRate:  isHero ? rnd(3, 7) : rnd(10, 24),
+  // Create hole in center
+  const holePath = new THREE.Path();
+  holePath.absarc(0, 0, holeRadius, 0, Math.PI * 2, false);
+  shape.holes.push(holePath);
+
+  // Extrude settings
+  const extrudeSettings = {
+    depth: depth,
+    bevelEnabled: true,
+    bevelSegments: 2,
+    steps: type === 'helical' ? 4 : 1,
+    bevelSize: radius * 0.02,
+    bevelThickness: radius * 0.02
   };
+
+  const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  
+  // Apply helical twist
+  if (type === 'helical') {
+    const vertices = geometry.attributes.position;
+    for (let i = 0; i < vertices.count; i++) {
+      const z = vertices.getZ(i);
+      const angleOffset = (z / depth) * 0.5; // twist amount
+      const x = vertices.getX(i);
+      const y = vertices.getY(i);
+      vertices.setX(i, x * Math.cos(angleOffset) - y * Math.sin(angleOffset));
+      vertices.setY(i, x * Math.sin(angleOffset) + y * Math.cos(angleOffset));
+    }
+    geometry.computeVertexNormals();
+  }
+
+  // Apply bevel skew
+  if (type === 'bevel') {
+    const vertices = geometry.attributes.position;
+    for (let i = 0; i < vertices.count; i++) {
+      const z = vertices.getZ(i);
+      const scale = 1 - (z / depth) * 0.4; // cone effect
+      vertices.setX(i, vertices.getX(i) * scale);
+      vertices.setY(i, vertices.getY(i) * scale);
+    }
+    geometry.computeVertexNormals();
+  }
+
+  geometry.center();
+  return geometry;
 }
 
-/* --------------------------------------------------------------------------
-   Build sword scene
-   -------------------------------------------------------------------------- */
-function buildSwordScene() {
-  APP.swords = [];
-  const W = APP.W;
-
-  // Determine which sword defs to include
-  let defs;
-  if (APP.activeSword === 'all') {
-    defs = SWORD_DEFS.map((_, i) => i);
+/* --- Gear Object Factory -------------------------------------------------- */
+function spawnGear(isActive) {
+  const typeKey = APP.activeGearType === 'all' ? GEAR_TYPE_KEYS[rndInt(0, GEAR_TYPE_KEYS.length - 1)] : APP.activeGearType;
+  const def = GEAR_TYPES[typeKey] || GEAR_TYPES['spur'];
+  const teeth = rndInt(def.teeth.min, def.teeth.max);
+  
+  const radius = isActive ? rnd(12, 18) : rnd(4, 9);
+  const mat = getMaterials(isActive);
+  const gearObj = new THREE.Group();
+  
+  if (typeKey === 'planetary') {
+    // Sun Gear
+    const sunR = radius * 0.4;
+    const sunGeo = createGearGeometry(sunR, Math.floor(teeth * 0.4), def.depth, 'spur');
+    const sunMesh = new THREE.Mesh(sunGeo, mat);
+    sunMesh.userData = { isSun: true };
+    gearObj.add(sunMesh);
+    
+    // Planet Gears
+    const planetR = radius * 0.28;
+    const orbitR = sunR + planetR + 0.1;
+    for(let i=0; i<3; i++) {
+      const pGeo = createGearGeometry(planetR, Math.floor(teeth * 0.3), def.depth, 'spur');
+      const pMesh = new THREE.Mesh(pGeo, mat);
+      const angle = (i / 3) * Math.PI * 2;
+      pMesh.position.set(Math.cos(angle) * orbitR, Math.sin(angle) * orbitR, 0);
+      pMesh.userData = { isPlanet: true };
+      gearObj.add(pMesh);
+    }
+    
+    // Ring Gear
+    const ringShape = new THREE.Shape();
+    ringShape.absarc(0, 0, radius * 1.3, 0, Math.PI * 2, false);
+    const ringHole = new THREE.Path();
+    const numTeeth = Math.floor(teeth * 1.2);
+    const angleStep = (Math.PI * 2) / numTeeth;
+    const innerR = radius * 1.05;
+    const outerR = radius * 1.15;
+    
+    for (let i = numTeeth - 1; i >= 0; i--) {
+      const angle = i * angleStep;
+      const nextAngle = (i + 1) * angleStep;
+      const toothAngle = angleStep * 0.4;
+      if (i === numTeeth - 1) ringHole.moveTo(Math.cos(nextAngle) * outerR, Math.sin(nextAngle) * outerR);
+      else ringHole.lineTo(Math.cos(nextAngle) * outerR, Math.sin(nextAngle) * outerR);
+      ringHole.lineTo(Math.cos(angle + toothAngle) * outerR, Math.sin(angle + toothAngle) * outerR);
+      ringHole.lineTo(Math.cos(angle + toothAngle * 0.8) * innerR, Math.sin(angle + toothAngle * 0.8) * innerR);
+      ringHole.lineTo(Math.cos(angle + toothAngle * 0.2) * innerR, Math.sin(angle + toothAngle * 0.2) * innerR);
+      ringHole.lineTo(Math.cos(angle) * outerR, Math.sin(angle) * outerR);
+    }
+    ringShape.holes.push(ringHole);
+    const ringGeo = new THREE.ExtrudeGeometry(ringShape, { depth: def.depth, bevelEnabled: true, bevelSegments: 1, bevelSize: radius*0.02, bevelThickness: radius*0.02 });
+    ringGeo.center();
+    const ringMesh = new THREE.Mesh(ringGeo, mat);
+    ringMesh.userData = { isRing: true };
+    gearObj.add(ringMesh);
+    
+  } else if (typeKey === 'worm') {
+    // Worm Wheel
+    const geo = createGearGeometry(radius, teeth, def.depth, 'helical');
+    const wheelMesh = new THREE.Mesh(geo, mat);
+    gearObj.add(wheelMesh);
+    
+    // Worm Shaft
+    class HelicalCurve extends THREE.Curve {
+      constructor(radius, length, coils) { super(); this.radius = radius; this.length = length; this.coils = coils; }
+      getPoint(t, optionalTarget = new THREE.Vector3()) {
+        return optionalTarget.set(Math.cos(t * Math.PI * 2 * this.coils) * this.radius, Math.sin(t * Math.PI * 2 * this.coils) * this.radius, (t - 0.5) * this.length);
+      }
+    }
+    const shaftL = radius * 2.5;
+    const shaftR = radius * 0.3;
+    const shaftGroup = new THREE.Group();
+    
+    const cylGeo = new THREE.CylinderGeometry(shaftR*0.8, shaftR*0.8, shaftL, 16);
+    const cylMesh = new THREE.Mesh(cylGeo, mat);
+    cylMesh.rotation.x = Math.PI / 2;
+    shaftGroup.add(cylMesh);
+    
+    const path = new HelicalCurve(shaftR, shaftL, 8);
+    const tubeGeo = new THREE.TubeGeometry(path, 100, radius * 0.08, 8, false);
+    const threadMesh = new THREE.Mesh(tubeGeo, mat);
+    shaftGroup.add(threadMesh);
+    
+    shaftGroup.position.set(0, radius + shaftR*0.5, 0);
+    // Orient the shaft tangentially along the X-axis
+    shaftGroup.rotation.y = Math.PI / 2;
+    shaftGroup.userData = { isShaft: true };
+    gearObj.add(shaftGroup);
+    
   } else {
-    defs = [SWORD_DEFS.findIndex(d => d.id === APP.activeSword)];
-    if (defs[0] === -1) defs = [0];
+    // Standard Gears
+    const geo = createGearGeometry(radius, teeth, def.depth, typeKey);
+    const mesh = new THREE.Mesh(geo, mat);
+    gearObj.add(mesh);
   }
 
-  // Hero sword — one prominent centered blade
-  const heroDefIdx = defs[rndInt(0, defs.length - 1)];
-  APP.swords.push(createSword(heroDefIdx, true));
+  gearObj.userData = {
+    radius: typeKey === 'planetary' ? radius * 1.3 : radius,
+    type: typeKey,
+    speed: (isActive ? rnd(0.5, 1.0) : rnd(0.2, 0.6)) * (Math.random() > 0.5 ? 1 : -1),
+    bobSpeed: rnd(0.5, 1.5),
+    bobY: rnd(0, Math.PI * 2),
+    bobAmp: isActive ? rnd(0.5, 1.5) : rnd(0.2, 0.8),
+    baseY: 0
+  };
 
-  // Background swords
-  const bgCount = APP.activeSword === 'all' ? 7 : 4;
-  for (let i = 0; i < bgCount; i++) {
-    const idx = defs[i % defs.length];
-    APP.swords.push(createSword(idx, false));
+  if (isActive) {
+    gearObj.position.set(15, 0, 0);
+    gearObj.userData.baseY = 0;
+  } else {
+    gearObj.position.set(rnd(-30, 30), rnd(-20, 20), rnd(-15, -5));
+    gearObj.userData.baseY = gearObj.position.y;
+    gearObj.rotation.x = rnd(0, Math.PI * 2);
+    gearObj.rotation.y = rnd(0, Math.PI * 2);
   }
 
-  updateSwordBanner();
+  gearGroup.add(gearObj);
+  return gearObj;
 }
 
-/* --------------------------------------------------------------------------
-   Update sword banner (hero HUD)
-   -------------------------------------------------------------------------- */
-function updateSwordBanner() {
-  const labelEl = $('#active-sword-label');
-  const stateEl = $('#active-sword-state');
-  if (!labelEl || !stateEl) return;
-  const pill = $(`.sword-select-pill.active`);
-  const label = pill ? pill.dataset.label || pill.textContent.trim() : 'All Blades';
-  labelEl.textContent = `Active Blade: ${label}`;
-  stateEl.textContent = 'Animated · Interactive';
-}
+/* --- Build scene ---------------------------------------------------------- */
+function buildGearScene() {
+  if (!threeScene) return;
 
-/* --------------------------------------------------------------------------
-   Sword draw functions — HD procedural rendering
-   -------------------------------------------------------------------------- */
-
-// — — — ICHIGO's TENSA ZANGETSU — — —
-// Curved daito, Manji tsuba, black cloth hilt, crimson chain, Getsuga ribbons
-function drawIchigo(ctx, scale, t, alpha, isHero) {
-  const s = scale * 130;
-
-  // ── Energy aura / Getsuga haze ──
-  if (isHero) {
-    const g = ctx.createRadialGradient(0, 0, s * 0.2, 0, 0, s * 0.8);
-    g.addColorStop(0, 'rgba(239,68,68,0.12)');
-    g.addColorStop(1, 'rgba(239,68,68,0.00)');
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, s * 0.55, s * 0.9, 0, 0, TAU);
-    ctx.fill();
-  }
-
-  // ── Getsuga crimson ribbons ──
-  if (isHero) {
-    for (let r = 0; r < 3; r++) {
-      const wave = Math.sin(t * 0.03 + r * 2.1 + 1.2) * s * 0.18;
-      ctx.save();
-      ctx.globalAlpha = 0.35 + 0.15 * Math.sin(t * 0.04 + r);
-      ctx.strokeStyle = r === 0 ? '#ef4444' : r === 1 ? '#dc2626' : '#fca5a5';
-      ctx.lineWidth = 2.5 - r * 0.5;
-      ctx.shadowColor = '#ef4444';
-      ctx.shadowBlur = 14;
-      ctx.beginPath();
-      ctx.moveTo(-s * 0.08, -s * 0.82 + r * s * 0.05);
-      ctx.bezierCurveTo(
-        wave, -s * 0.5,
-        -wave, -s * 0.2,
-        wave * 0.6, s * 0.3
-      );
-      ctx.stroke();
-      ctx.restore();
-    }
-  }
-
-  // ── Blade — curved daito ──
-  ctx.save();
-  // Blade base shape (back edge)
-  ctx.beginPath();
-  ctx.moveTo(0, -s * 0.92);       // Kissaki tip
-  ctx.bezierCurveTo(
-    s * 0.08, -s * 0.70,
-    s * 0.10, -s * 0.30,
-    s * 0.07, s * 0.10            // Munemachi (blade/hilt join)
-  );
-  ctx.lineTo(s * 0.03, s * 0.10);
-  ctx.bezierCurveTo(
-    s * 0.06, -s * 0.28,
-    s * 0.04, -s * 0.68,
-    -s * 0.02, -s * 0.92
-  );
-  ctx.closePath();
-
-  // Blade gradient — mirror polish
-  const bladeGrad = ctx.createLinearGradient(-s * 0.05, -s * 0.9, s * 0.12, s * 0.1);
-  bladeGrad.addColorStop(0.0,  '#e8e8f0');
-  bladeGrad.addColorStop(0.25, '#b8bfca');
-  bladeGrad.addColorStop(0.5,  '#d0d5de');
-  bladeGrad.addColorStop(0.75, '#8a9098');
-  bladeGrad.addColorStop(1.0,  '#6d737c');
-  ctx.fillStyle = bladeGrad;
-  ctx.fill();
-
-  // Hamon line (temper line)
-  ctx.beginPath();
-  ctx.moveTo(s * 0.04, s * 0.06);
-  ctx.bezierCurveTo(s * 0.07, -s * 0.18, s * 0.09, -s * 0.42, s * 0.05, -s * 0.78);
-  ctx.strokeStyle = 'rgba(255,255,255,0.65)';
-  ctx.lineWidth = 1.1;
-  ctx.stroke();
-
-  // Edge highlight
-  ctx.beginPath();
-  ctx.moveTo(-s * 0.018, -s * 0.91);
-  ctx.bezierCurveTo(-s * 0.01, -s * 0.60, 0, -s * 0.28, s * 0.02, s * 0.10);
-  ctx.strokeStyle = 'rgba(220,225,240,0.90)';
-  ctx.lineWidth = 1.5;
-  ctx.shadowColor = 'rgba(255,255,255,0.8)';
-  ctx.shadowBlur = 6;
-  ctx.stroke();
-  ctx.restore();
-
-  // ── Habaki collar ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(-s * 0.055, s * 0.06, s * 0.115, s * 0.055);
-  const habakiG = ctx.createLinearGradient(-s * 0.055, 0, s * 0.06, 0);
-  habakiG.addColorStop(0, '#4a4a54');
-  habakiG.addColorStop(0.5, '#7a7a88');
-  habakiG.addColorStop(1, '#3a3a44');
-  ctx.fillStyle = habakiG;
-  ctx.fill();
-  ctx.restore();
-
-  // ── Manji tsuba (cross-guard) ──
-  ctx.save();
-  ctx.strokeStyle = '#2a2a2a';
-  ctx.lineWidth = s * 0.036;
-  ctx.lineCap = 'round';
-  ctx.shadowColor = 'rgba(0,0,0,0.6)';
-  ctx.shadowBlur = 6;
-  // Horizontal bar
-  ctx.beginPath();
-  ctx.moveTo(-s * 0.22, s * 0.115);
-  ctx.lineTo( s * 0.22, s * 0.115);
-  ctx.stroke();
-  // Manji hook - top left
-  ctx.beginPath();
-  ctx.moveTo(-s * 0.22, s * 0.115);
-  ctx.lineTo(-s * 0.22, s * 0.05);
-  ctx.stroke();
-  // Manji hook - bottom right
-  ctx.beginPath();
-  ctx.moveTo(s * 0.22, s * 0.115);
-  ctx.lineTo(s * 0.22, s * 0.18);
-  ctx.stroke();
-  ctx.restore();
-
-  // ── Hilt — black cloth diamond wrap ──
-  ctx.save();
-  const hiltLen = s * 0.36;
-  ctx.beginPath();
-  ctx.rect(-s * 0.045, s * 0.155, s * 0.09, hiltLen);
-  ctx.fillStyle = '#1a1a1a';
-  ctx.fill();
-  // Diamond ito wrap
-  for (let d = 0; d < 7; d++) {
-    const dy = s * 0.165 + d * s * 0.048;
-    ctx.beginPath();
-    ctx.moveTo(-s * 0.045, dy);
-    ctx.lineTo(0, dy + s * 0.024);
-    ctx.lineTo(s * 0.045, dy);
-    ctx.strokeStyle = 'rgba(80,80,95,0.70)';
-    ctx.lineWidth = 1.2;
-    ctx.stroke();
-  }
-  ctx.restore();
-
-  // ── Chain links ──
-  if (isHero) {
-    ctx.save();
-    const chainSwing = Math.sin(t * 0.02) * s * 0.12;
-    const chainY = s * 0.52;
-    for (let c = 0; c < 5; c++) {
-      const cx = chainSwing * (c / 4);
-      const cy = chainY + c * s * 0.06;
-      ctx.beginPath();
-      ctx.ellipse(cx, cy, s * 0.022, s * 0.014, Math.PI / 4 + c * 0.4, 0, TAU);
-      ctx.strokeStyle = '#3a3a3a';
-      ctx.lineWidth = 1.6;
-      ctx.stroke();
-    }
-    ctx.restore();
-  }
-
-  // ── Pommel ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.ellipse(0, s * 0.54, s * 0.05, s * 0.03, 0, 0, TAU);
-  ctx.fillStyle = '#2a2a2a';
-  ctx.fill();
-  ctx.restore();
-}
-
-// — — — SASUKE's KUSANAGI — — —
-// Straight chokuto, chrome blade, black hilt, Chidori lightning arcs
-function drawKusanagi(ctx, scale, t, alpha, isHero) {
-  const s = scale * 130;
-
-  // ── Chidori lightning field ──
-  if (isHero) {
-    for (let l = 0; l < 4; l++) {
-      ctx.save();
-      ctx.globalAlpha = 0.55 * Math.abs(Math.sin(t * 0.08 + l * 1.6));
-      ctx.strokeStyle = l % 2 === 0 ? '#60a5fa' : '#a78bfa';
-      ctx.lineWidth = 1.0;
-      ctx.shadowColor = '#3b82f6';
-      ctx.shadowBlur = 12;
-      ctx.beginPath();
-      let lx = rnd(-s * 0.25, s * 0.25);
-      let ly = -s * 0.75;
-      ctx.moveTo(lx, ly);
-      for (let seg = 0; seg < 5; seg++) {
-        lx += rnd(-s * 0.08, s * 0.08);
-        ly += rnd(s * 0.12, s * 0.22);
-        ctx.lineTo(lx, ly);
+  function disposeGroup(grp) {
+    if (!grp || !grp.children) return;
+    grp.children.forEach(child => {
+      if (child.isMesh) {
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) child.material.dispose();
+      } else if (child.isGroup) {
+        disposeGroup(child);
       }
-      ctx.stroke();
-      ctx.restore();
-    }
-  }
-
-  // ── Straight chokuto blade ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(0, -s * 0.90);       // Tip
-  ctx.lineTo( s * 0.05, -s * 0.82);
-  ctx.lineTo( s * 0.06,  s * 0.08);
-  ctx.lineTo(-s * 0.06,  s * 0.08);
-  ctx.lineTo(-s * 0.04, -s * 0.82);
-  ctx.closePath();
-
-  const bladeGrad = ctx.createLinearGradient(-s * 0.06, 0, s * 0.06, 0);
-  bladeGrad.addColorStop(0.0,  '#c8d0e0');
-  bladeGrad.addColorStop(0.3,  '#e8ecf4');
-  bladeGrad.addColorStop(0.55, '#f4f6fa');
-  bladeGrad.addColorStop(0.80, '#b8c0cc');
-  bladeGrad.addColorStop(1.0,  '#7a8090');
-  ctx.fillStyle = bladeGrad;
-  ctx.fill();
-
-  // Fuller groove
-  ctx.beginPath();
-  ctx.moveTo(s * 0.012, -s * 0.84);
-  ctx.lineTo(s * 0.012,  s * 0.04);
-  ctx.strokeStyle = 'rgba(160,170,190,0.55)';
-  ctx.lineWidth = 1.8;
-  ctx.stroke();
-
-  // Edge gleam
-  ctx.beginPath();
-  ctx.moveTo(-s * 0.038, -s * 0.88);
-  ctx.lineTo(-s * 0.056,  s * 0.06);
-  ctx.strokeStyle = 'rgba(235,240,255,0.92)';
-  ctx.lineWidth = 1.4;
-  ctx.shadowColor = 'rgba(96,165,250,0.7)';
-  ctx.shadowBlur = 10;
-  ctx.stroke();
-
-  // Blue tint at tip (lightning charge)
-  const tipGrad = ctx.createLinearGradient(0, -s * 0.90, 0, -s * 0.60);
-  tipGrad.addColorStop(0, 'rgba(96,165,250,0.50)');
-  tipGrad.addColorStop(1, 'rgba(96,165,250,0.00)');
-  ctx.beginPath();
-  ctx.moveTo(0, -s * 0.90);
-  ctx.lineTo(s * 0.05, -s * 0.82);
-  ctx.lineTo(-s * 0.04, -s * 0.82);
-  ctx.closePath();
-  ctx.fillStyle = tipGrad;
-  ctx.fill();
-  ctx.restore();
-
-  // ── Habaki ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(-s * 0.07, s * 0.04, s * 0.14, s * 0.06);
-  const hG = ctx.createLinearGradient(-s * 0.07, 0, s * 0.07, 0);
-  hG.addColorStop(0, '#1a1a2a');
-  hG.addColorStop(0.5, '#3a3a5a');
-  hG.addColorStop(1, '#1a1a2a');
-  ctx.fillStyle = hG;
-  ctx.fill();
-  ctx.restore();
-
-  // ── Round tsuba with kunai slots ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(0, s * 0.13, s * 0.14, 0, TAU);
-  ctx.fillStyle = '#1c1c28';
-  ctx.fill();
-  ctx.strokeStyle = '#3b82f6';
-  ctx.lineWidth = 1.5;
-  ctx.shadowColor = '#3b82f6';
-  ctx.shadowBlur = 8;
-  ctx.stroke();
-  // Inner circle
-  ctx.beginPath();
-  ctx.arc(0, s * 0.13, s * 0.08, 0, TAU);
-  ctx.strokeStyle = 'rgba(96,165,250,0.35)';
-  ctx.lineWidth = 1.0;
-  ctx.stroke();
-  ctx.restore();
-
-  // ── Black hilt with blue bindings ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(-s * 0.045, s * 0.27, s * 0.09, s * 0.32);
-  ctx.fillStyle = '#0f0f1a';
-  ctx.fill();
-  // Blue wrap lines
-  for (let b = 0; b < 6; b++) {
-    const by = s * 0.28 + b * s * 0.046;
-    ctx.beginPath();
-    ctx.moveTo(-s * 0.045, by);
-    ctx.lineTo( s * 0.045, by);
-    ctx.strokeStyle = 'rgba(59,130,246,0.50)';
-    ctx.lineWidth = 1.0;
-    ctx.stroke();
-  }
-  ctx.restore();
-
-  // ── Pommel ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(0, s * 0.62, s * 0.052, 0, TAU);
-  ctx.fillStyle = '#1c1c28';
-  ctx.fill();
-  ctx.strokeStyle = '#3b82f6';
-  ctx.lineWidth = 1.2;
-  ctx.stroke();
-  ctx.restore();
-}
-
-// — — — ZORO's WADO ICHIMONJI — — —
-// White-polished blade, gold circular tsuba, white hilt wrap, cyan wind slashes
-function drawWado(ctx, scale, t, alpha, isHero) {
-  const s = scale * 130;
-
-  // ── Cyan wind slashes ──
-  if (isHero) {
-    for (let w = 0; w < 3; w++) {
-      const age = (t * 0.018 + w * 2.1) % TAU;
-      const fade = Math.sin(age) * 0.5 + 0.5;
-      ctx.save();
-      ctx.globalAlpha = fade * 0.45;
-      ctx.strokeStyle = '#67e8f9';
-      ctx.lineWidth = 1.2 + w * 0.4;
-      ctx.shadowColor = '#06b6d4';
-      ctx.shadowBlur = 14;
-      ctx.beginPath();
-      ctx.arc(0, -s * 0.2, s * (0.25 + w * 0.12), -0.7, 0.2);
-      ctx.stroke();
-      ctx.restore();
-    }
-  }
-
-  // ── Polished white-silver blade ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(0, -s * 0.92);
-  ctx.lineTo(s * 0.04, -s * 0.84);
-  ctx.lineTo(s * 0.06,  s * 0.06);
-  ctx.lineTo(-s * 0.06,  s * 0.06);
-  ctx.lineTo(-s * 0.04, -s * 0.84);
-  ctx.closePath();
-
-  const bladeGrad = ctx.createLinearGradient(-s * 0.06, 0, s * 0.06, 0);
-  bladeGrad.addColorStop(0.00, '#f0f4fa');
-  bladeGrad.addColorStop(0.30, '#ffffff');
-  bladeGrad.addColorStop(0.60, '#e8ecf4');
-  bladeGrad.addColorStop(0.85, '#c8d4e0');
-  bladeGrad.addColorStop(1.00, '#a8b8c8');
-  ctx.fillStyle = bladeGrad;
-  ctx.fill();
-
-  // Mirror hamon — wavy temper line
-  ctx.beginPath();
-  let hamonX = s * 0.035;
-  for (let hy = s * 0.05; hy > -s * 0.85; hy -= s * 0.06) {
-    hamonX = s * 0.032 + Math.sin(hy * 5.5) * s * 0.008;
-    ctx.lineTo(hamonX, hy);
-  }
-  ctx.strokeStyle = 'rgba(255,255,255,0.80)';
-  ctx.lineWidth = 1.0;
-  ctx.stroke();
-
-  // Bright edge
-  ctx.beginPath();
-  ctx.moveTo(-s * 0.038, -s * 0.90);
-  ctx.lineTo(-s * 0.055,  s * 0.04);
-  ctx.strokeStyle = 'rgba(255,255,255,0.95)';
-  ctx.lineWidth = 1.6;
-  ctx.shadowColor = 'rgba(103,232,249,0.8)';
-  ctx.shadowBlur = 8;
-  ctx.stroke();
-  ctx.restore();
-
-  // ── Gold habaki ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(-s * 0.065, s * 0.03, s * 0.13, s * 0.06);
-  const habG = ctx.createLinearGradient(-s * 0.065, 0, s * 0.065, 0);
-  habG.addColorStop(0, '#7a6000');
-  habG.addColorStop(0.4, '#d4a800');
-  habG.addColorStop(0.7, '#f0cc00');
-  habG.addColorStop(1, '#7a6000');
-  ctx.fillStyle = habG;
-  ctx.fill();
-  ctx.restore();
-
-  // ── Gold circular tsuba ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(0, s * 0.12, s * 0.13, 0, TAU);
-  const tsubaGrad = ctx.createRadialGradient(0, s * 0.12, s * 0.04, 0, s * 0.12, s * 0.13);
-  tsubaGrad.addColorStop(0, '#d4a800');
-  tsubaGrad.addColorStop(0.5, '#a07800');
-  tsubaGrad.addColorStop(1, '#6a5000');
-  ctx.fillStyle = tsubaGrad;
-  ctx.fill();
-  // Gold rim
-  ctx.strokeStyle = '#f0cc00';
-  ctx.lineWidth = 1.5;
-  ctx.shadowColor = '#f0cc00';
-  ctx.shadowBlur = 6;
-  ctx.stroke();
-  // Inner ring
-  ctx.beginPath();
-  ctx.arc(0, s * 0.12, s * 0.075, 0, TAU);
-  ctx.strokeStyle = 'rgba(240,204,0,0.45)';
-  ctx.lineWidth = 1.0;
-  ctx.stroke();
-  ctx.restore();
-
-  // ── White hilt with ray-skin diamonds ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(-s * 0.042, s * 0.25, s * 0.084, s * 0.32);
-  ctx.fillStyle = '#f8f8fc';
-  ctx.fill();
-  // Diamond wrap (white cloth)
-  for (let d = 0; d < 7; d++) {
-    const dy = s * 0.26 + d * s * 0.044;
-    ctx.beginPath();
-    ctx.moveTo(-s * 0.042, dy);
-    ctx.lineTo(0, dy + s * 0.022);
-    ctx.lineTo(s * 0.042, dy);
-    ctx.strokeStyle = 'rgba(200,210,220,0.65)';
-    ctx.lineWidth = 1.0;
-    ctx.stroke();
-  }
-  ctx.restore();
-
-  // ── White pommel ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(0, s * 0.60, s * 0.048, 0, TAU);
-  ctx.fillStyle = '#e8eaf0';
-  ctx.fill();
-  ctx.strokeStyle = '#d4a800';
-  ctx.lineWidth = 1.2;
-  ctx.stroke();
-  ctx.restore();
-}
-
-// — — — ZORO's SANDAI KITETSU — — —
-// Flared guard, red tsuka, wavy hamon, demonic scarlet embers
-function drawKitetsu(ctx, scale, t, alpha, isHero) {
-  const s = scale * 130;
-
-  // ── Scarlet ember particles emanating ──
-  if (isHero && Math.random() < 0.12) {
-    spawnParticle(
-      rnd(-s * 0.08, s * 0.08),
-      rnd(-s * 0.6, -s * 0.1),
-      ['#ef4444', '#f87171', '#fca5a5', '#fbbf24'],
-      'rgba(239,68,68,0.3)'
-    );
-  }
-
-  // ── Demonic red aura ──
-  if (isHero) {
-    const aura = ctx.createRadialGradient(0, -s * 0.1, 0, 0, -s * 0.1, s * 0.6);
-    aura.addColorStop(0, 'rgba(239,68,68,0.15)');
-    aura.addColorStop(0.6, 'rgba(239,68,68,0.06)');
-    aura.addColorStop(1, 'rgba(239,68,68,0.00)');
-    ctx.fillStyle = aura;
-    ctx.beginPath();
-    ctx.ellipse(0, -s * 0.1, s * 0.42, s * 0.70, 0, 0, TAU);
-    ctx.fill();
-  }
-
-  // ── Blade with wavy hamon ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(0, -s * 0.90);
-  ctx.lineTo( s * 0.055, -s * 0.82);
-  ctx.lineTo( s * 0.065,  s * 0.06);
-  ctx.lineTo(-s * 0.065,  s * 0.06);
-  ctx.lineTo(-s * 0.04,  -s * 0.82);
-  ctx.closePath();
-
-  const bladeGrad = ctx.createLinearGradient(-s * 0.065, 0, s * 0.065, 0);
-  bladeGrad.addColorStop(0.00, '#c8ccd8');
-  bladeGrad.addColorStop(0.25, '#e0e4f0');
-  bladeGrad.addColorStop(0.55, '#d8dcec');
-  bladeGrad.addColorStop(0.80, '#a0a8b8');
-  bladeGrad.addColorStop(1.00, '#708090');
-  ctx.fillStyle = bladeGrad;
-  ctx.fill();
-
-  // Wavy flame hamon
-  ctx.beginPath();
-  ctx.moveTo(s * 0.025, s * 0.04);
-  for (let h = 1; h <= 14; h++) {
-    const hy = s * 0.04 - h * s * 0.067;
-    const hx = s * 0.025 + Math.sin(h * 1.4 + t * 0.03) * s * 0.018;
-    ctx.lineTo(hx, hy);
-  }
-  ctx.strokeStyle = 'rgba(255,180,180,0.70)';
-  ctx.lineWidth = 1.0;
-  ctx.shadowColor = '#ef4444';
-  ctx.shadowBlur = 5;
-  ctx.stroke();
-
-  // Red-tinted edge
-  ctx.beginPath();
-  ctx.moveTo(-s * 0.038, -s * 0.88);
-  ctx.lineTo(-s * 0.058, s * 0.04);
-  ctx.strokeStyle = 'rgba(252,165,165,0.88)';
-  ctx.lineWidth = 1.5;
-  ctx.shadowColor = 'rgba(239,68,68,0.8)';
-  ctx.shadowBlur = 8;
-  ctx.stroke();
-  ctx.restore();
-
-  // ── Habaki (dark) ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(-s * 0.07, s * 0.04, s * 0.14, s * 0.055);
-  ctx.fillStyle = '#3a1010';
-  ctx.fill();
-  ctx.strokeStyle = '#ef4444';
-  ctx.lineWidth = 0.8;
-  ctx.stroke();
-  ctx.restore();
-
-  // ── Flared notched guard ──
-  ctx.save();
-  // Main tsuba — wider flared
-  ctx.beginPath();
-  for (let pt = 0; pt < 8; pt++) {
-    const a = (pt / 8) * TAU - Math.PI / 8;
-    const r2 = pt % 2 === 0 ? s * 0.17 : s * 0.13;
-    if (pt === 0) ctx.moveTo(Math.cos(a) * r2, s * 0.12 + Math.sin(a) * r2);
-    else ctx.lineTo(Math.cos(a) * r2, s * 0.12 + Math.sin(a) * r2);
-  }
-  ctx.closePath();
-  ctx.fillStyle = '#2a0808';
-  ctx.fill();
-  ctx.strokeStyle = '#ef4444';
-  ctx.lineWidth = 1.5;
-  ctx.shadowColor = '#ef4444';
-  ctx.shadowBlur = 8;
-  ctx.stroke();
-  ctx.restore();
-
-  // ── Red tsuka wrap ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(-s * 0.044, s * 0.27, s * 0.088, s * 0.33);
-  ctx.fillStyle = '#8b0000';
-  ctx.fill();
-  // Black cross-wrap
-  for (let w = 0; w < 7; w++) {
-    const wy = s * 0.28 + w * s * 0.044;
-    ctx.beginPath();
-    ctx.moveTo(-s * 0.044, wy);
-    ctx.lineTo( s * 0.044, wy + s * 0.02);
-    ctx.strokeStyle = 'rgba(20,0,0,0.60)';
-    ctx.lineWidth = 1.2;
-    ctx.stroke();
-  }
-  ctx.restore();
-
-  // ── Pommel ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(0, s * 0.63, s * 0.052, 0, TAU);
-  ctx.fillStyle = '#3a0808';
-  ctx.fill();
-  ctx.strokeStyle = '#ef4444';
-  ctx.lineWidth = 1.3;
-  ctx.stroke();
-  ctx.restore();
-}
-
-// — — — ZORO's ENMA — — —
-// Cloverleaf tsuba, lilac wrap, gold cherry blossom accents, purple Ryuo vapor
-function drawEnma(ctx, scale, t, alpha, isHero) {
-  const s = scale * 130;
-
-  // ── Ryuo purple vapor ──
-  if (isHero) {
-    for (let v = 0; v < 3; v++) {
-      const vAngle = t * 0.015 + v * 2.1;
-      const vr = s * (0.22 + v * 0.11);
-      ctx.save();
-      ctx.globalAlpha = 0.22 + 0.12 * Math.sin(t * 0.025 + v);
-      const vGrad = ctx.createRadialGradient(
-        Math.cos(vAngle) * vr * 0.5, Math.sin(vAngle) * vr * 0.5 - s * 0.1, 0,
-        Math.cos(vAngle) * vr * 0.5, Math.sin(vAngle) * vr * 0.5 - s * 0.1, vr * 0.8
-      );
-      vGrad.addColorStop(0, 'rgba(192,132,252,0.55)');
-      vGrad.addColorStop(1, 'rgba(192,132,252,0.00)');
-      ctx.fillStyle = vGrad;
-      ctx.beginPath();
-      ctx.ellipse(
-        Math.cos(vAngle) * vr * 0.3, Math.sin(vAngle) * vr * 0.3 - s * 0.1,
-        vr * 0.35, vr * 0.55, vAngle, 0, TAU
-      );
-      ctx.fill();
-      ctx.restore();
-    }
-  }
-
-  // ── Blade — dark-silver with purple sheen ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(0, -s * 0.91);
-  ctx.lineTo( s * 0.05, -s * 0.83);
-  ctx.lineTo( s * 0.065,  s * 0.06);
-  ctx.lineTo(-s * 0.065,  s * 0.06);
-  ctx.lineTo(-s * 0.04,  -s * 0.83);
-  ctx.closePath();
-
-  const bladeGrad = ctx.createLinearGradient(-s * 0.065, 0, s * 0.065, 0);
-  bladeGrad.addColorStop(0.00, '#9090b0');
-  bladeGrad.addColorStop(0.30, '#c8c0e0');
-  bladeGrad.addColorStop(0.55, '#b0a8d0');
-  bladeGrad.addColorStop(0.80, '#7878a0');
-  bladeGrad.addColorStop(1.00, '#5050708');
-  ctx.fillStyle = bladeGrad;
-  ctx.fill();
-
-  // Purple edge glow (Ryuo haki)
-  ctx.beginPath();
-  ctx.moveTo(-s * 0.038, -s * 0.89);
-  ctx.lineTo(-s * 0.056,  s * 0.04);
-  ctx.strokeStyle = 'rgba(196,140,255,0.88)';
-  ctx.lineWidth = 1.8;
-  ctx.shadowColor = 'rgba(168,85,247,0.85)';
-  ctx.shadowBlur = 12;
-  ctx.stroke();
-
-  // Hamon
-  ctx.beginPath();
-  ctx.moveTo(s * 0.032, s * 0.04);
-  ctx.bezierCurveTo(s * 0.040, -s * 0.28, s * 0.038, -s * 0.55, s * 0.026, -s * 0.82);
-  ctx.strokeStyle = 'rgba(220,210,255,0.65)';
-  ctx.lineWidth = 1.0;
-  ctx.shadowBlur = 0;
-  ctx.stroke();
-  ctx.restore();
-
-  // ── Gold habaki ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(-s * 0.07, s * 0.03, s * 0.14, s * 0.058);
-  const hG = ctx.createLinearGradient(-s * 0.07, 0, s * 0.07, 0);
-  hG.addColorStop(0, '#6a5000');
-  hG.addColorStop(0.4, '#c89800');
-  hG.addColorStop(0.7, '#e0b400');
-  hG.addColorStop(1, '#6a5000');
-  ctx.fillStyle = hG;
-  ctx.fill();
-  ctx.restore();
-
-  // ── Trefoil / cloverleaf gold tsuba ──
-  ctx.save();
-  ctx.translate(0, s * 0.12);
-  for (let p = 0; p < 3; p++) {
-    const pa = (p / 3) * TAU - Math.PI / 2;
-    const px = Math.cos(pa) * s * 0.085;
-    const py = Math.sin(pa) * s * 0.085;
-    ctx.beginPath();
-    ctx.arc(px, py, s * 0.085, 0, TAU);
-    const leafG = ctx.createRadialGradient(px, py, 0, px, py, s * 0.085);
-    leafG.addColorStop(0, '#e0b400');
-    leafG.addColorStop(0.6, '#a07800');
-    leafG.addColorStop(1, '#6a5000');
-    ctx.fillStyle = leafG;
-    ctx.fill();
-    ctx.strokeStyle = '#f0cc00';
-    ctx.lineWidth = 1.2;
-    ctx.shadowColor = '#f0cc00';
-    ctx.shadowBlur = 6;
-    ctx.stroke();
-  }
-  // Center disc
-  ctx.beginPath();
-  ctx.arc(0, 0, s * 0.045, 0, TAU);
-  ctx.fillStyle = '#e0b400';
-  ctx.fill();
-  ctx.restore();
-
-  // ── Cherry blossom accents on hilt ──
-  // Lilac hilt wrap
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(-s * 0.044, s * 0.26, s * 0.088, s * 0.33);
-  ctx.fillStyle = '#7c3aed';
-  ctx.fill();
-  // Gold diagonal wrap
-  for (let w = 0; w < 7; w++) {
-    const wy = s * 0.27 + w * s * 0.044;
-    ctx.beginPath();
-    ctx.moveTo(-s * 0.044, wy);
-    ctx.lineTo( s * 0.044, wy + s * 0.02);
-    ctx.strokeStyle = 'rgba(240,204,0,0.45)';
-    ctx.lineWidth = 1.0;
-    ctx.stroke();
-  }
-  // Cherry blossom dots
-  if (isHero) {
-    for (let cb = 0; cb < 5; cb++) {
-      const cbx = rnd(-s * 0.20, s * 0.20);
-      const cby = rnd(-s * 0.70, s * 0.20);
-      const fade = Math.sin(t * 0.02 + cb * 1.3) * 0.5 + 0.5;
-      ctx.globalAlpha = fade * 0.7;
-      ctx.beginPath();
-      for (let petal = 0; petal < 5; petal++) {
-        const pa = (petal / 5) * TAU;
-        const pr = s * 0.018;
-        ctx.beginPath();
-        ctx.arc(cbx + Math.cos(pa) * pr, cby + Math.sin(pa) * pr, pr * 0.55, 0, TAU);
-        ctx.fillStyle = '#f9a8d4';
-        ctx.fill();
-      }
-      ctx.globalAlpha = 1;
-    }
-  }
-  ctx.restore();
-
-  // ── Pommel ──
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(0, s * 0.62, s * 0.052, 0, TAU);
-  ctx.fillStyle = '#4c1d95';
-  ctx.fill();
-  ctx.strokeStyle = '#f0cc00';
-  ctx.lineWidth = 1.3;
-  ctx.stroke();
-  ctx.restore();
-}
-
-/* --------------------------------------------------------------------------
-   Animation loop
-   -------------------------------------------------------------------------- */
-function animLoop(t = 0) {
-  const { ctx, W, H } = APP;
-  ctx.clearRect(0, 0, W, H);
-
-  // Parallax offset from scroll
-  const parallaxY = APP.scrollY * 0.08;
-
-  // Draw background swords first, then hero
-  const sorted = [...APP.swords].sort((a, b) => a.isHero ? 1 : -1);
-
-  sorted.forEach(sw => {
-    sw.angle    += sw.rotateSpeed;
-    sw.bobY     += sw.bobSpeed;
-    sw.pulseT   += sw.pulseSpeed;
-    sw.driftAngle += sw.driftSpeed;
-
-    // Position with drift + bob
-    const drawX = sw.x + Math.cos(sw.driftAngle) * sw.driftRadius * 0.4;
-    const drawY = sw.y + Math.sin(sw.bobY) * sw.bobAmp
-                 - parallaxY * (sw.isHero ? 0.3 : 0.15);
-
-    // Pulse scale for hero blade
-    let sc = sw.scale;
-    if (sw.isHero) {
-      sc = sw.scale * (1.0 + Math.sin(sw.pulseT) * 0.025);
-    }
-
-    // Spawn trail particles for hero blade
-    sw.particleTimer++;
-    if (sw.particleTimer >= sw.particleRate) {
-      sw.particleTimer = 0;
-      const tipX = drawX + Math.cos(sw.angle - Math.PI / 2) * sc * 130 * 0.88;
-      const tipY = drawY + Math.sin(sw.angle - Math.PI / 2) * sc * 130 * 0.88;
-      spawnParticle(tipX, tipY, sw.def.particleColors, sw.def.auraColor);
-    }
-
-    ctx.save();
-    ctx.globalAlpha = sw.alpha;
-    ctx.translate(drawX, drawY);
-    ctx.rotate(sw.angle);
-
-    // Aura glow for hero
-    if (sw.isHero) {
-      ctx.shadowColor = sw.def.auraColor;
-      ctx.shadowBlur  = 30;
-    }
-
-    sw.def.draw(ctx, sc, t, sw.alpha, sw.isHero);
-
-    ctx.restore();
-  });
-
-  // Particles
-  updateParticles();
-  drawParticles(ctx);
-
-  APP.animFrameId = requestAnimationFrame(ts => animLoop(ts * 0.05));
-}
-
-/* --------------------------------------------------------------------------
-   Resize handler
-   -------------------------------------------------------------------------- */
-function handleResize() {
-  const canvas = APP.canvas;
-  APP.W = canvas.width  = window.innerWidth;
-  APP.H = canvas.height = window.innerHeight;
-  buildSwordScene();
-}
-
-/* --------------------------------------------------------------------------
-   Sword toolbar interaction
-   -------------------------------------------------------------------------- */
-function initSwordToolbar() {
-  $$('.sword-select-pill').forEach(pill => {
-    pill.addEventListener('click', () => {
-      $$('.sword-select-pill').forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
-      APP.activeSword = pill.dataset.sword;
-      APP.particles = [];
-      buildSwordScene();
-      playHaptic('click');
-      const label = pill.dataset.label || pill.textContent.trim();
-      showToast(`Blade selected: ${label}`, '⚔️');
     });
+  }
+
+  // Clear existing gears
+  while(gearGroup.children.length > 0){ 
+    const grp = gearGroup.children[0];
+    disposeGroup(grp);
+    gearGroup.remove(grp); 
+  }
+  bgGearMeshes = [];
+
+  // Active Gear
+  activeGearMesh = spawnGear(true);
+  
+  // Background Gears (Non-overlapping approximation in 3D)
+  let attempts = 0;
+  while (bgGearMeshes.length < 8 && attempts < 100) {
+    attempts++;
+    const grp = spawnGear(false);
+    
+    // Simple bounding sphere collision check
+    let safe = true;
+    for (let existing of [activeGearMesh, ...bgGearMeshes]) {
+      const dist = grp.position.distanceTo(existing.position);
+      const minSafeDist = grp.userData.radius + existing.userData.radius + 2;
+      if (dist < minSafeDist) {
+        safe = false;
+        break;
+      }
+    }
+    
+    if (safe) {
+      bgGearMeshes.push(grp);
+    } else {
+      gearGroup.remove(grp);
+      disposeGroup(grp);
+    }
+  }
+
+  updateGearBanner();
+}
+
+/* --- Defense Lines Background --------------------------------------------- */
+const bgCanvas = document.getElementById('bg-canvas');
+let bgCtx, bgWidth, bgHeight;
+let defenseParticles = [];
+
+function initDefenseLines() {
+  if (!bgCanvas) return;
+  bgCtx = bgCanvas.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  bgWidth = window.innerWidth;
+  bgHeight = window.innerHeight;
+  bgCanvas.width = Math.max(1, Math.floor(bgWidth * dpr));
+  bgCanvas.height = Math.max(1, Math.floor(bgHeight * dpr));
+  bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  bgCtx.imageSmoothingEnabled = false;
+  
+  defenseParticles = [];
+  const particleCount = window.innerWidth < 768 ? 40 : 100;
+  for(let i = 0; i < particleCount; i++) {
+      defenseParticles.push({
+          x: Math.random() * bgWidth,
+          y: Math.random() * bgHeight,
+          baseLength: Math.random() * 80 + 20,
+          speedY: Math.random() * 0.8 + 0.2,
+          baseOpacity: Math.random() * 0.2 + 0.05
+      });
+  }
+}
+
+function animateDefenseLines() {
+  if (!bgCtx) return;
+  bgCtx.clearRect(0, 0, bgWidth, bgHeight);
+  const centerX = bgWidth / 2;
+  const centerY = bgHeight / 2;
+  bgCtx.lineCap = 'butt';
+  bgCtx.lineJoin = 'miter';
+  
+  defenseParticles.forEach(p => {
+      const distFromCenterX = Math.abs(p.x - centerX);
+      const distFromCenterY = Math.abs(p.y - centerY);
+      const proximityX = Math.max(0, 1 - (distFromCenterX / (bgWidth / 2)));
+      const proximityY = Math.max(0, 1 - (distFromCenterY / (bgHeight / 2)));
+      const centerProximity = proximityX * (0.4 + proximityY * 0.6);
+      const currentLength = p.baseLength * (1 + centerProximity * 4); 
+      const currentOpacity = Math.min(1.0, p.baseOpacity + (centerProximity * 2.0));
+      const brightness = Math.floor(centerProximity * 180);
+      
+      bgCtx.beginPath();
+      const grad = bgCtx.createLinearGradient(p.x, p.y, p.x, p.y + currentLength);
+      grad.addColorStop(0, `rgba(220, 38, 38, 0)`);
+      grad.addColorStop(0.5, `rgba(255, ${38 + brightness}, ${38 + brightness}, ${currentOpacity})`);
+      grad.addColorStop(1, `rgba(220, 38, 38, 0)`);
+      
+      bgCtx.strokeStyle = grad;
+      bgCtx.lineWidth = 0.5;
+      bgCtx.moveTo(p.x, p.y);
+      bgCtx.lineTo(p.x, p.y + currentLength);
+      bgCtx.stroke();
+
+      p.y -= p.speedY * 1.5 * (1 + centerProximity * 0.5);
+      
+      if(p.y + currentLength < 0) {
+          p.y = bgHeight;
+          p.x = Math.random() * bgWidth;
+      }
   });
 }
 
-/* --------------------------------------------------------------------------
-   Canvas init
-   -------------------------------------------------------------------------- */
-function initSwordEngine() {
-  const canvas = $('#ambient-canvas');
-  if (!canvas) return;
-  APP.canvas = canvas;
-  APP.ctx    = canvas.getContext('2d');
-  APP.W = canvas.width  = window.innerWidth;
-  APP.H = canvas.height = window.innerHeight;
+/* --- Init Three.js -------------------------------------------------------- */
+function initGearEngine() {
+  initDefenseLines();
+
+  const container = $('#three-canvas-container');
+  if (!container || typeof THREE === 'undefined') {
+    console.warn("Three.js not loaded or container missing.");
+    return;
+  }
+
+  // Set container styles
+  container.style.position = 'fixed';
+  container.style.top = '0';
+  container.style.left = '0';
+  container.style.width = '100vw';
+  container.style.height = '100vh';
+  container.style.zIndex = '0';
+  container.style.pointerEvents = 'none';
+
+  threeScene = new THREE.Scene();
+  
+  threeCamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+  threeCamera.position.z = 80;
+  threeCamera.position.x = -15;
+
+  threeRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  threeRenderer.setSize(window.innerWidth, window.innerHeight);
+  threeRenderer.setPixelRatio(window.devicePixelRatio);
+  container.appendChild(threeRenderer.domElement);
+
+  // Lighting
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+  threeScene.add(ambientLight);
+
+  const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  dirLight.position.set(10, 20, 30);
+  threeScene.add(dirLight);
+
+  const pointLight = new THREE.PointLight(0xef4444, 2, 100);
+  pointLight.position.set(15, 0, 10);
+  threeScene.add(pointLight);
+
+  threeScene.add(gearGroup);
 
   window.addEventListener('resize', debounce(handleResize, 200));
-  window.addEventListener('scroll', () => { APP.scrollY = window.scrollY; }, { passive: true });
-  window.addEventListener('mousemove', e => {
-    APP.mouse.x = e.clientX;
-    APP.mouse.y = e.clientY;
-  }, { passive: true });
-
-  buildSwordScene();
+  
+  buildGearScene();
   animLoop();
 }
+
+/* --- Animation loop ------------------------------------------------------- */
+function animLoop() {
+  APP.animFrameId = requestAnimationFrame(animLoop);
+  
+  animateDefenseLines();
+
+  if (!threeRenderer || !threeScene || !threeCamera) return;
+
+  const dt = clock.getDelta();
+  const time = clock.getElapsedTime();
+
+  gearGroup.rotation.y = Math.sin(time * 0.3) * 0.3;
+  gearGroup.rotation.x = Math.sin(time * 0.2) * 0.2;
+
+  gearGroup.children.forEach(group => {
+    const baseSpeed = group.userData.speed * dt;
+    // Rotation
+    group.rotation.z += baseSpeed;
+    
+    // Bobbing
+    group.position.y = group.userData.baseY + Math.sin(time * group.userData.bobSpeed + group.userData.bobY) * group.userData.bobAmp;
+
+    // Internal parts animation
+    if (group.userData.type === 'planetary') {
+      group.children.forEach(child => {
+        if (child.userData.isPlanet) child.rotation.z -= baseSpeed * 3;
+        else if (child.userData.isSun) child.rotation.z += baseSpeed * 2.5;
+        else if (child.userData.isRing) child.rotation.z -= baseSpeed * 1.5;
+      });
+    } else if (group.userData.type === 'worm') {
+      group.children.forEach(child => {
+        if (child.userData.isShaft) child.rotation.z += baseSpeed * 15;
+      });
+    }
+  });
+
+  // Pulse active gear light
+  const pointLight = threeScene.children.find(c => c.isPointLight);
+  if (pointLight) {
+    pointLight.intensity = 2 + Math.sin(time * 2) * 0.5;
+  }
+
+  threeRenderer.render(threeScene, threeCamera);
+}
+
+/* --- Resize handler ------------------------------------------------------- */
+function handleResize() {
+  initDefenseLines();
+  if (!threeCamera || !threeRenderer) return;
+  threeCamera.aspect = window.innerWidth / window.innerHeight;
+  threeCamera.updateProjectionMatrix();
+  threeRenderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+/* --- Gear toolbar interaction --------------------------------------------- */
+function initGearToolbar() {
+  $$('.gear-select-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      $$('.gear-select-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      APP.activeGearType = pill.dataset.gear;
+      buildGearScene();
+      updateGearBanner();
+      playHaptic('click');
+      showToast(`Gear type: ${pill.textContent.trim()}`, '⚙️');
+    });
+  });
+}
+
+function updateGearBanner() {
+  const labelEl = $('#active-gear-label');
+  const stateEl = $('#active-gear-state');
+  if (labelEl && stateEl) {
+    const pill = $(`.gear-select-pill.active`);
+    const label = pill ? pill.textContent.trim() : 'All Types';
+    labelEl.textContent = `Active System: ${label}`;
+    stateEl.textContent = 'WebGL Render · Interactive';
+  }
+}
+
 
 // ===========================================================================
 // COMMAND PALETTE
@@ -1243,30 +752,29 @@ const CMD_ITEMS = [
   { id: 'goto_documentation', icon: '📐', title: 'Go to Documentation',         desc: 'AutoCAD, GD&T, BOMs',                  action: () => scrollTo('#documentation') },
   { id: 'goto_contact',       icon: '📧', title: 'Get in Touch',                desc: 'Contact & engineering enquiry',         action: () => scrollTo('#contact') },
   { id: 'theme_toggle',       icon: '🌓', title: 'Toggle Theme',                desc: 'Switch dark / light mode',             action: () => $('#theme-toggle-btn').click() },
-  { id: 'sword_all',          icon: '⚔️', title: 'All Blades',                  desc: 'Show all anime swords',                action: () => setSword('all') },
-  { id: 'sword_ichigo',       icon: '🌑', title: 'Ichigo – Tensa Zangetsu',     desc: 'Curved daito, crimson Getsuga',        action: () => setSword('ichigo') },
-  { id: 'sword_kusanagi',     icon: '⚡', title: 'Sasuke – Kusanagi',           desc: 'Chokuto, Chidori lightning',           action: () => setSword('kusanagi') },
-  { id: 'sword_wado',         icon: '🤍', title: 'Zoro – Wado Ichimonji',       desc: 'White blade, gold tsuba',              action: () => setSword('wado') },
-  { id: 'sword_kitetsu',      icon: '🔴', title: 'Zoro – Sandai Kitetsu',       desc: 'Cursed blade, scarlet embers',         action: () => setSword('kitetsu') },
-  { id: 'sword_enma',         icon: '🟣', title: 'Zoro – Enma',                 desc: 'Cloverleaf tsuba, Ryuo vapor',         action: () => setSword('enma') },
+  { id: 'gear_spur',          icon: '🔩', title: 'Show Spur Gears',             desc: 'Standard involute spur gear',          action: () => setGearType('spur') },
+  { id: 'gear_bevel',         icon: '🔺', title: 'Show Bevel Gears',            desc: 'Conical bevel gear pair',              action: () => setGearType('bevel') },
+  { id: 'gear_helical',       icon: '〰️', title: 'Show Helical Gears',          desc: 'Helical involute gear',               action: () => setGearType('helical') },
+  { id: 'gear_planetary',     icon: '🌐', title: 'Show Planetary Gears',        desc: 'Epicyclic sun / planet / ring',        action: () => setGearType('planetary') },
+  { id: 'gear_worm',          icon: '⚡', title: 'Show Worm & Shaft',           desc: 'High-reduction worm gear drive',       action: () => setGearType('worm') },
   { id: 'calc_cargo',         icon: '🛫', title: 'Simulate: Air Cargo Deck',    desc: 'Calculate 7,000 kg ULD load stress',   action: () => runSimCmd('calc-air-cargo') },
   { id: 'calc_strip',         icon: '🦾', title: 'Simulate: Strip Flattening',  desc: 'Roll force for 6mm steel strip',       action: () => runSimCmd('strip-tonnage') },
   { id: 'calc_tspacer',       icon: '⚡', title: 'Simulate: T-Spacer Cycle',    desc: 'SPM cycle time calculation',           action: () => runSimCmd('t-spacer-cycle') },
   { id: 'calc_steel',         icon: '🏗️', title: 'Simulate: Steel Plant Quote', desc: 'Budgetary CAPEX estimate',             action: () => runSimCmd('steel-plant-quote') },
-  { id: 'copy_email',         icon: '📋', title: 'Copy Email Address',          desc: 'pran.acharya.eng@gmail.com',           action: () => copyText('pran.acharya.eng@gmail.com', 'Email copied!') },
+  { id: 'copy_email',         icon: '📋', title: 'Copy Email Address',          desc: 'acharyapranav1992@gmail.com',           action: () => copyText('acharyapranav1992@gmail.com', 'Email copied!') },
 ];
 
 function scrollTo(hash) { document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' }); closeCmdPalette(); }
 
-function setSword(id) {
-  const pill = $(`.sword-select-pill[data-sword="${id}"]`);
+function setGearType(type) {
+  const pill = $(`.gear-select-pill[data-gear="${type}"]`);
   if (pill) {
-    $$('.sword-select-pill').forEach(p => p.classList.remove('active'));
+    $$('.gear-select-pill').forEach(p => p.classList.remove('active'));
     pill.classList.add('active');
   }
-  APP.activeSword = id;
-  APP.particles = [];
-  buildSwordScene();
+  APP.activeGearType = type;
+  buildGearScene();
+  updateGearBanner();
   closeCmdPalette();
 }
 
@@ -1287,7 +795,8 @@ function openCmdPalette() {
   if (!overlay) return;
   APP.cmdPaletteOpen = true;
   overlay.classList.add('open');
-  setTimeout(() => $('#cmd-input')?.focus(), 60);
+  const input = $('#cmd-input');
+  setTimeout(() => input?.focus(), 60);
   renderCmdResults('');
 }
 
@@ -1313,7 +822,7 @@ function renderCmdResults(query) {
 
   const sections = [
     { label: 'Navigation', ids: ['goto_hero','goto_projects','goto_architecture','goto_experience','goto_documentation','goto_contact','theme_toggle'] },
-    { label: 'Anime Blades', ids: ['sword_all','sword_ichigo','sword_kusanagi','sword_wado','sword_kitetsu','sword_enma'] },
+    { label: 'Gear Systems', ids: ['gear_spur','gear_bevel','gear_helical','gear_planetary','gear_worm'] },
     { label: 'Simulations', ids: ['calc_cargo','calc_strip','calc_tspacer','calc_steel'] },
     { label: 'Quick Actions', ids: ['copy_email'] },
   ];
@@ -1344,8 +853,8 @@ function initCmdPalette() {
   const openBtns = [$('#open-cmd-btn'), $('#hero-cmd-btn')].filter(Boolean);
   openBtns.forEach(b => b.addEventListener('click', openCmdPalette));
 
-  const overlay = $('#cmd-overlay');
-  const input   = $('#cmd-input');
+  const overlay  = $('#cmd-overlay');
+  const input    = $('#cmd-input');
 
   overlay?.addEventListener('click', e => { if (e.target === overlay) closeCmdPalette(); });
   input?.addEventListener('input', () => renderCmdResults(input.value));
@@ -1358,6 +867,7 @@ function initCmdPalette() {
     if (e.key === 'Escape' && APP.cmdPaletteOpen) closeCmdPalette();
   });
 
+  // Keyboard shortcut label: show ⌘K on Mac, Ctrl+K on others
   const kbd = $('#kbd-shortcut-label');
   if (kbd && !navigator.platform.toLowerCase().includes('mac')) {
     kbd.textContent = 'Ctrl+K';
@@ -1601,7 +1111,7 @@ function initCopyLinks() {
 }
 
 // ===========================================================================
-// HERO BRIEF
+// HERO BRIEF DOWNLOAD (placeholder)
 // ===========================================================================
 function initHeroBrief() {
   const btn = $('#hero-brief-btn');
@@ -1637,8 +1147,10 @@ const SIM_COMMANDS = {
     ];
   },
   'strip-tonnage': () => {
-    const w = 1200; const t = 6; const Y = 355;
-    const F = (w * t * Y * 1.3 / 1000).toFixed(1);
+    const w = 1200;  // mm
+    const t = 6;     // mm
+    const Y = 355;   // MPa
+    const F = (w * t * Y * 1.3 / 1000).toFixed(1);  // kN (empirical 1.3 factor)
     const rolls = 17;
     const perRoll = (F / (rolls / 2)).toFixed(1);
     return [
@@ -1656,8 +1168,11 @@ const SIM_COMMANDS = {
     ];
   },
   't-spacer-cycle': () => {
-    const feedL = 1000; const servoAcc = 180; const servoV = 400;
-    const cutTime = 0.12; const clampTime = 0.06;
+    const feedL    = 1000;  // mm index
+    const servoAcc = 180;   // mm/s²
+    const servoV   = 400;   // mm/s
+    const cutTime  = 0.12;  // s
+    const clampTime = 0.06; // s each
     const tAccel = servoV / servoAcc;
     const tFeed  = tAccel + (feedL - servoV * servoV / (2 * servoAcc)) / servoV;
     const tTotal = (tFeed + cutTime + clampTime * 2).toFixed(2);
@@ -1744,7 +1259,7 @@ function initTerminal() {
 }
 
 // ===========================================================================
-// CONTACT FORM
+// CONTACT FORM (mailto fallback)
 // ===========================================================================
 function initContactForm() {
   const form = $('#contact-form');
@@ -1755,8 +1270,9 @@ function initContactForm() {
     const email   = $('#contact-email').value.trim();
     const subject = $('#contact-subject').value.trim() || 'Engineering Enquiry';
     const message = $('#contact-message').value.trim();
-    const body    = `Name: ${name}\nEmail: ${email}\n\n${message}`;
-    const mailto  = `mailto:pran.acharya.eng@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    const body = `Name: ${name}\nEmail: ${email}\n\n${message}`;
+    const mailto = `mailto:acharyapranav1992@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailto;
     showToast('Opening your email client…', '📧', 3200);
     playHaptic('success');
@@ -1764,7 +1280,7 @@ function initContactForm() {
 }
 
 // ===========================================================================
-// SCROLL REVEAL
+// SCROLL REVEAL ANIMATION
 // ===========================================================================
 function initScrollReveal() {
   const els = $$('.reveal-on-scroll');
@@ -1781,12 +1297,11 @@ function initScrollReveal() {
 // ===========================================================================
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
-  initAccentPicker();
   initNavbar();
   initMobileDrawer();
   initAudio();
-  initSwordEngine();
-  initSwordToolbar();
+  initGearEngine();
+  initGearToolbar();
   initCmdPalette();
   initProjectFilters();
   initModals();
@@ -1797,5 +1312,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollReveal();
 
   // Welcome toast
-  setTimeout(() => showToast('Portfolio loaded — Anime Blades Active ⚔️', '⚔️', 3200), 700);
+  setTimeout(() => showToast('Mechanical Design Portfolio — 3D Gears Active ⚙️', '⚙️', 3200), 600);
 });

@@ -1,607 +1,905 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark" data-accent="crimson">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Karampudi Acharya Pranav | Mechanical Design Engineer</title>
-  
-  <!-- Fonts -->
+  <title>Karampudi Acharya Pranav — Mechanical Design Engineer</title>
+  <meta name="description" content="Portfolio of Karampudi Acharya Pranav — Mechanical Design Engineer specialising in 3D Modelling, Manufacturing Drawings, GD&T, Material Handling Equipment, Air Cargo GSE, and FEA Analysis.">
+  <meta name="keywords" content="Karampudi Acharya Pranav, Mechanical Design Engineer, SolidWorks, AutoCAD, ANSYS, GD&T, MHE, Air Cargo, FEA, 3D Modelling">
+  <meta name="author" content="Karampudi Acharya Pranav">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23070110%22/><circle cx=%2250%22 cy=%2250%22 r=%2238%22 fill=%22none%22 stroke=%22%23ef4444%22 stroke-width=%223%22 stroke-dasharray=%226%22/><text y=%2264%22 x=%2250%22 text-anchor=%22middle%22 font-size=%2236%22 font-family=%22monospace%22 font-weight=%22800%22 fill=%22%23ef4444%22>KAP</text></svg>">
+
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
 
-  <!-- Ambient Background (Anime Sword Engine) -->
-  <canvas id="ambient-canvas"></canvas>
-  <div class="bg-glow-orb orb-1"></div>
-  <div class="bg-glow-orb orb-2"></div>
-  <div class="bg-glow-orb orb-3"></div>
+  <!-- 3D WebGL Gear Engine Container -->
+  <div id="three-canvas-container"></div>
 
-  <!-- Toast Notification Container -->
-  <div class="toast-container" id="toast-container"></div>
+  <!-- Defense Lines Canvas Background -->
+  <canvas id="bg-canvas" class="absolute inset-0 z-0 opacity-50 pointer-events-none" style="width: 100vw; height: 100vh; position: fixed;"></canvas>
+  
+  <!-- Ambient background glow -->
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[60%] w-[800px] h-[500px] bg-red-600/10 rounded-full blur-[150px] pointer-events-none z-0" style="position: fixed;"></div>
 
-  <!-- Command Palette Overlay -->
-  <div class="cmd-overlay" id="cmd-overlay">
-    <div class="cmd-box">
-      <div class="cmd-search-row">
-        <span class="cmd-search-icon">⌘</span>
-        <input type="text" class="cmd-input" id="cmd-input" placeholder="Search commands, projects, or simulations..." autocomplete="off">
-      </div>
-      <div class="cmd-results" id="cmd-results">
-        <!-- Injected via JS -->
-      </div>
-      <div class="cmd-footer">
-        <span class="cmd-hint"><span>↑↓</span> to navigate</span>
-        <span class="cmd-hint"><span>↵</span> to select</span>
-        <span class="cmd-hint"><span>Esc</span> to close</span>
-      </div>
-    </div>
-  </div>
+  <div class="app-container">
 
-  <!-- Case Study Modal Overlay -->
-  <div class="modal-overlay" id="modal-overlay">
-    <div class="modal-box">
-      <div class="modal-header">
-        <div>
-          <div class="modal-title" id="modal-title">Project Title</div>
-          <div class="modal-badge" id="modal-badge" style="margin-top: 0.5rem; display: inline-block;">Badge</div>
+    <!-- ======================================================================
+         NAVIGATION BAR — Clean & Focused
+         ====================================================================== -->
+    <header class="navbar" id="navbar">
+      <div class="nav-container">
+
+        <!-- Brand -->
+        <a href="#hero" class="brand-logo" aria-label="Karampudi Acharya Pranav Portfolio">
+          <div class="brand-monogram">KAP</div>
+          <div class="brand-info">
+            <span class="brand-name">Karampudi Acharya Pranav</span>
+            <span class="brand-sub">Mechanical Design Engineer</span>
+          </div>
+        </a>
+
+        <!-- Nav Links -->
+        <nav>
+          <ul class="nav-links">
+            <li><a href="#hero"          class="nav-link active">Overview</a></li>
+            <li><a href="#projects"      class="nav-link">Projects</a></li>
+            <li><a href="#architecture"  class="nav-link">Skills &amp; Tools</a></li>
+            <li><a href="#experience"    class="nav-link">Experience</a></li>
+            <li><a href="#documentation" class="nav-link">Documentation</a></li>
+          </ul>
+        </nav>
+
+        <!-- Nav Actions -->
+        <div class="nav-actions">
+
+          <!-- CAD Tools Command Palette -->
+          <button class="cmd-palette-btn" id="open-cmd-btn" title="Open Engineering Tools (Ctrl+K)" aria-label="Open Command Palette">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>CAD Tools</span>
+            <span class="kbd-badge" id="kbd-shortcut-label">⌘K</span>
+          </button>
+
+          <!-- Light / Dark Toggle -->
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Light / Dark Mode" aria-label="Toggle Theme">
+            <svg id="theme-sun-icon"  width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg id="theme-moon-icon" style="display:none;" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+
+          <!-- Audio Toggle -->
+          <button class="btn-icon audio-toggle" id="audio-toggle-btn" title="Toggle UI Audio Haptics" aria-label="Toggle Audio">
+            <svg id="audio-icon-muted" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+            <svg id="audio-icon-active" style="display:none;" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          </button>
+
+          <!-- Contact Button (CTA) -->
+          <a href="#contact" class="btn-contact-nav">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Contact
+          </a>
+
+          <!-- Mobile Menu -->
+          <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Toggle Navigation">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+
         </div>
-        <button class="modal-close" id="modal-close">✕</button>
       </div>
-      <div class="modal-body" id="modal-body">
-        <!-- Injected via JS -->
-      </div>
-    </div>
-  </div>
+    </header>
 
-  <!-- Navigation Bar -->
-  <nav class="navbar" id="navbar">
-    <div class="nav-container">
-      <div class="brand-logo">
-        <div class="brand-monogram">KP</div>
-        <div class="brand-info">
-          <span class="brand-name">Karampudi Acharya Pranav</span>
-          <span class="brand-sub">Mechanical Design Engineer</span>
-        </div>
-      </div>
-      
-      <ul class="nav-links">
-        <li><a href="#hero" class="nav-link active">Overview</a></li>
-        <li><a href="#projects" class="nav-link">Projects</a></li>
-        <li><a href="#architecture" class="nav-link">Skills</a></li>
-        <li><a href="#experience" class="nav-link">Experience</a></li>
+
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-drawer" id="mobile-drawer">
+      <ul class="mobile-nav-links" style="flex:1;">
+        <li><a href="#hero"          class="mobile-nav-link" data-close-drawer>Overview</a></li>
+        <li><a href="#projects"      class="mobile-nav-link" data-close-drawer>Projects</a></li>
+        <li><a href="#architecture"  class="mobile-nav-link" data-close-drawer>Skills &amp; Tools</a></li>
+        <li><a href="#experience"    class="mobile-nav-link" data-close-drawer>Experience</a></li>
+        <li><a href="#documentation" class="mobile-nav-link" data-close-drawer>Documentation</a></li>
       </ul>
-
-      <div class="nav-actions">
-        <!-- Command Palette Toggle -->
-        <button class="cmd-palette-btn" id="open-cmd-btn" title="Open Command Palette">
-          <span class="kbd-badge" id="kbd-shortcut-label">⌘K</span>
-        </button>
-
-        <!-- Accent Palette Picker -->
-        <div class="accent-picker">
-          <div class="accent-dot" data-accent="cyan" title="Blueprint Cyan"></div>
-          <div class="accent-dot" data-accent="amber" title="Industrial Amber"></div>
-          <div class="accent-dot active" data-accent="crimson" title="Getsuga Crimson"></div>
-          <div class="accent-dot" data-accent="purple" title="Ryuo Purple"></div>
-          <div class="accent-dot" data-accent="emerald" title="Precision Emerald"></div>
-        </div>
-
-        <!-- Audio Haptic Toggle -->
-        <button class="btn-icon" id="audio-toggle-btn" title="Toggle Audio Haptics">
-          <span id="audio-icon-muted" style="display: none;">🔇</span>
-          <span id="audio-icon-active">🔊</span>
-        </button>
-
-        <!-- Light/Dark Theme Toggle -->
-        <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Theme">
-          <span id="theme-sun-icon" style="display: none;">☀️</span>
-          <span id="theme-moon-icon">🌙</span>
-        </button>
-        
-        <a href="#contact" class="btn-contact-nav" data-close-drawer>Connect</a>
-        
-        <button class="btn-icon mobile-menu-btn" id="mobile-menu-toggle">☰</button>
+      <div style="margin-top:2rem;">
+        <a href="#contact" class="btn btn-primary" style="width:100%;justify-content:center;" data-close-drawer>Get In Touch</a>
       </div>
     </div>
-  </nav>
 
-  <!-- Mobile Drawer -->
-  <div class="mobile-drawer" id="mobile-drawer">
-    <ul class="mobile-nav-links">
-      <li><a href="#hero" class="mobile-nav-link" data-close-drawer>Overview</a></li>
-      <li><a href="#projects" class="mobile-nav-link" data-close-drawer>Projects</a></li>
-      <li><a href="#architecture" class="mobile-nav-link" data-close-drawer>Skills</a></li>
-      <li><a href="#experience" class="mobile-nav-link" data-close-drawer>Experience</a></li>
-      <li><a href="#documentation" class="mobile-nav-link" data-close-drawer>Documentation</a></li>
-      <li><a href="#contact" class="mobile-nav-link" data-close-drawer>Contact</a></li>
-    </ul>
-  </div>
+    <main>
 
-  <!-- Anime Sword Selector Toolbar -->
-  <div class="sword-toolbar-container">
-    <div class="sword-toolbar">
-      <div class="sword-toolbar-label">Active Blade</div>
-      <button class="sword-select-pill active" data-sword="all" data-label="All Blades">⚔️ All</button>
-      <button class="sword-select-pill" data-sword="ichigo" data-label="Tensa Zangetsu">🌑 Ichigo</button>
-      <button class="sword-select-pill" data-sword="kusanagi" data-label="Kusanagi">⚡ Sasuke</button>
-      <button class="sword-select-pill" data-sword="wado" data-label="Wado Ichimonji">🤍 Zoro (Wado)</button>
-      <button class="sword-select-pill" data-sword="kitetsu" data-label="Sandai Kitetsu">🔴 Zoro (Kitetsu)</button>
-      <button class="sword-select-pill" data-sword="enma" data-label="Enma">🟣 Zoro (Enma)</button>
-    </div>
-  </div>
+      <!-- ====================================================================
+           HERO SECTION
+           ==================================================================== -->
+      <section class="section-wrapper hero-section" id="hero">
+        <div class="hero-layout">
+          <div class="hero-content">
 
-  <main class="app-container">
-    
-    <!-- ================= HERO OVERVIEW ================= -->
-    <section id="hero" class="section-wrapper hero-section">
-      <div class="hero-layout">
-        <div class="hero-content reveal-on-scroll">
-          <div class="status-badge">
-            <div class="pulse-dot"></div>
-            Available for New Projects
-          </div>
-          
-          <div class="hero-name-eyebrow">Hi, I'm Karampudi Acharya Pranav.</div>
-          <h1 class="hero-title">Engineering <br><span class="text-gradient">Precision.</span></h1>
-          
-          <p class="hero-subtitle">
-            I specialize in <strong>Mechanical Design</strong>, <strong>3D Modelling</strong>, and <strong>Project Management</strong>. From Air Cargo Castor Decks to High-Speed SPM Cutting Machines, I transform complex requirements into optimized, manufacturing-ready blueprints.
-          </p>
-
-          <div class="hero-actions">
-            <a href="#projects" class="btn btn-primary">Explore Portfolio</a>
-            <button class="btn btn-glow-accent" id="hero-cmd-btn">
-              <span>⌘K</span> Open Command Terminal
-            </button>
-          </div>
-
-          <div class="metrics-strip">
-            <div class="metric-item">
-              <span class="metric-value">4+</span>
-              <span class="metric-label">Years Experience</span>
+            <!-- Availability Badge -->
+            <div class="status-badge">
+              <span class="pulse-dot"></span>
+              <span>Mechanical Design Engineer · Open to Opportunities</span>
             </div>
-            <div class="metric-item">
-              <span class="metric-value">12+</span>
-              <span class="metric-label">SPMs Designed</span>
+
+            <div class="hero-name-eyebrow">// KARAMPUDI ACHARYA PRANAV</div>
+
+            <!-- Main Headline -->
+            <h1 class="hero-title">
+              Engineering <span class="text-gradient">Precision Design</span> &amp; Manufacturing Solutions.
+            </h1>
+
+            <!-- Bio -->
+            <p class="hero-subtitle">
+              Mechanical Design Engineer with hands-on experience in <strong>3D Modelling</strong>, <strong>Engineering Drawings</strong>, 
+              <strong>GD&amp;T</strong>, and <strong>Manufacturing Support</strong>. 
+              Specialized in <strong>Material Handling Equipment (MHE)</strong> for cargo terminals, 
+              <strong>Air Cargo Ground Support Equipment</strong>, Special Purpose Machinery, and 
+              <strong>FEA Load Analysis</strong>. Executing design from concept through inspection and site commissioning.
+            </p>
+
+            <!-- Action CTAs -->
+            <div class="hero-actions">
+              <a href="#projects" class="btn btn-primary">
+                <span>Explore Projects</span>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+              </a>
+              <button class="btn btn-secondary" id="hero-cmd-btn">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+                <span>Engineering Console</span>
+                <span class="kbd-badge">⌘K</span>
+              </button>
             </div>
-            <div class="metric-item">
-              <span class="metric-value">100%</span>
-              <span class="metric-label">FEA Validation</span>
+
+            <!-- Quantitative Metrics -->
+            <div class="metrics-strip">
+              <div class="metric-item">
+                <span class="metric-value">2+</span>
+                <span class="metric-label">Years of Experience</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">180+</span>
+                <span class="metric-label">3D Assemblies Modelled</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">7,000 kg</span>
+                <span class="metric-label">Air Cargo ULD Capacity</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">30%</span>
+                <span class="metric-label">Mfg Quality Improvement</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="hero-visual reveal-on-scroll" style="transition-delay: 0.2s;">
+          <!-- Hero HUD Technical Panel -->
           <div class="hero-hud-card">
             <div class="hud-header">
-              <div class="hud-title"><span>⚙️</span> System Active</div>
-              <div class="cad-badge">CAD / FEA READY</div>
-            </div>
-            <div class="hud-specs-list">
-              <div class="hud-spec-item">
-                <span class="hud-spec-label">Primary Tool:</span>
-                <span class="hud-spec-value text-accent">SolidWorks / AutoCAD</span>
-              </div>
-              <div class="hud-spec-item">
-                <span class="hud-spec-label">Simulation:</span>
-                <span class="hud-spec-value">ANSYS APDL / SW Simulation</span>
-              </div>
-              <div class="hud-spec-item">
-                <span class="hud-spec-label">Drafting Std:</span>
-                <span class="hud-spec-value">ASME Y14.5M GD&T</span>
-              </div>
-              <div class="hud-spec-item">
-                <span class="hud-spec-label">Rendering:</span>
-                <span class="hud-spec-value">KeyShot HD</span>
+              <div class="hud-title">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Select Gear System</span>
               </div>
             </div>
-            
-            <div class="sword-banner-indicator">
-              <span id="active-sword-label">Active Blade: All Blades</span>
-              <span id="active-sword-state">Animated</span>
+
+            <div class="hud-specs-list" style="display: flex; flex-direction: column; gap: 0.5rem; padding-top: 1rem;">
+              <button class="gear-select-pill active" data-gear="all" style="width:100%; justify-content: flex-start;">⚙️ All Types</button>
+              <button class="gear-select-pill" data-gear="spur" style="width:100%; justify-content: flex-start;">🔩 Spur Gear</button>
+              <button class="gear-select-pill" data-gear="bevel" style="width:100%; justify-content: flex-start;">🔺 Bevel Gear</button>
+              <button class="gear-select-pill" data-gear="helical" style="width:100%; justify-content: flex-start;">〰️ Helical Gear</button>
+              <button class="gear-select-pill" data-gear="planetary" style="width:100%; justify-content: flex-start;">🌐 Planetary Gear</button>
+              <button class="gear-select-pill" data-gear="worm" style="width:100%; justify-content: flex-start;">⚡ Worm &amp; Shaft</button>
+            </div>
+
+            <!-- Gear System Indicator -->
+            <div class="gear-banner-indicator">
+              <div style="display:flex;align-items:center;gap:0.5rem;">
+                <span class="pulse-dot"></span>
+                <span id="active-gear-label">Active System: All Gear Types</span>
+              </div>
+              <span id="active-gear-state">Rendering · Interactive</span>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- ================= PROJECTS PORTFOLIO ================= -->
-    <section id="projects" class="section-wrapper" style="padding-top: 2rem;">
-      <div class="section-header reveal-on-scroll">
-        <span class="section-eyebrow">Portfolio</span>
-        <h2 class="section-title">Engineered Solutions.</h2>
-        <p class="section-description">
-          A selection of industrial machinery, material handling equipment, and heavy engineering projects taken from concept to commissioning.
-        </p>
-      </div>
-
-      <div class="project-filters reveal-on-scroll">
-        <button class="filter-btn active" data-filter="all">All Systems</button>
-        <button class="filter-btn" data-filter="spm">Special Purpose Machines</button>
-        <button class="filter-btn" data-filter="mhe">Material Handling</button>
-        <button class="filter-btn" data-filter="plant">Plant Layout</button>
-      </div>
-
-      <div class="projects-grid">
-        
-        <!-- Project: Air Cargo Deck -->
-        <article class="project-card reveal-on-scroll" data-category="mhe">
-          <div class="project-card-header">
-            <span class="project-code-label"><span>[PRJ-01]</span> MHE DECK</span>
-            <span class="tag-pill">Air Cargo GSE</span>
-          </div>
-          <div class="project-body">
-            <h3 class="project-title">Lazy Dolly Castor & Powered Roller Deck</h3>
-            <p class="project-desc">7,000 kg capacity wide-body aircraft cargo loading deck with bi-directional AC drives and omni-directional ball castor matrices.</p>
-            
-            <div class="project-metrics-row">
-              <div class="project-metric">7,000 kg Dynamic Load</div>
-              <div class="project-metric">0.35 m/s Drive</div>
-              <div class="project-metric">IATA AHM 913</div>
-            </div>
-            
-            <div class="project-tech-tags">
-              <span class="tech-tag">SolidWorks</span>
-              <span class="tech-tag">AutoCAD</span>
-              <span class="tech-tag">Motor Sizing</span>
-            </div>
-            
-            <div class="project-actions">
-              <button class="btn btn-secondary btn-sm view-case-study" data-project="air_cargo">View Architecture</button>
-              <button class="btn btn-primary btn-sm" onclick="document.querySelector('[data-cmd=\\'calc-air-cargo\\']').click(); document.querySelector('#architecture').scrollIntoView({behavior: 'smooth'})">Run Sim</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Project: Strip Flattening Machine -->
-        <article class="project-card reveal-on-scroll" data-category="spm">
-          <div class="project-card-header">
-            <span class="project-code-label"><span>[PRJ-02]</span> SPM LEVELER</span>
-            <span class="tag-pill">Steel Processing</span>
-          </div>
-          <div class="project-body">
-            <h3 class="project-title">17-Roll Strip Flattening Machine</h3>
-            <p class="project-desc">Heavy-duty precision leveler for 6mm steel strip, utilizing 80kN hydraulic cylinders and planetary gearboxes for perfect flatness.</p>
-            
-            <div class="project-metrics-row">
-              <div class="project-metric">1,200mm Width</div>
-              <div class="project-metric">80 kN Downforce</div>
-              <div class="project-metric">HRC 60 Rolls</div>
-            </div>
-            
-            <div class="project-tech-tags">
-              <span class="tech-tag">Hydraulic Sizing</span>
-              <span class="tech-tag">ISO 281</span>
-              <span class="tech-tag">Large Assembly</span>
-            </div>
-            
-            <div class="project-actions">
-              <button class="btn btn-secondary btn-sm view-case-study" data-project="strip_flattening">View Architecture</button>
-              <button class="btn btn-primary btn-sm" onclick="document.querySelector('[data-cmd=\\'strip-tonnage\\']').click(); document.querySelector('#architecture').scrollIntoView({behavior: 'smooth'})">Run Sim</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Project: T-Spacer Cutting Machine -->
-        <article class="project-card reveal-on-scroll" data-category="spm">
-          <div class="project-card-header">
-            <span class="project-code-label"><span>[PRJ-03]</span> SPM CUTTER</span>
-            <span class="tag-pill">Automation</span>
-          </div>
-          <div class="project-body">
-            <h3 class="project-title">Automated T-Spacer Cutting Machine</h3>
-            <p class="project-desc">High-speed cutting machine for glass spacer profiles. Servo ball-screw indexing delivers ±0.05mm accuracy at 1.8s cycle times.</p>
-            
-            <div class="project-metrics-row">
-              <div class="project-metric">1.8s Cycle Time</div>
-              <div class="project-metric">±0.05mm Acc.</div>
-              <div class="project-metric">94% Yield</div>
-            </div>
-            
-            <div class="project-tech-tags">
-              <span class="tech-tag">Servo Sizing</span>
-              <span class="tech-tag">Pneumatics</span>
-              <span class="tech-tag">ISO 13855</span>
-            </div>
-            
-            <div class="project-actions">
-              <button class="btn btn-secondary btn-sm view-case-study" data-project="t_spacer">View Architecture</button>
-              <button class="btn btn-primary btn-sm" onclick="document.querySelector('[data-cmd=\\'t-spacer-cycle\\']').click(); document.querySelector('#architecture').scrollIntoView({behavior: 'smooth'})">Run Sim</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Project: Steel Plant Quote -->
-        <article class="project-card reveal-on-scroll" data-category="plant">
-          <div class="project-card-header">
-            <span class="project-code-label"><span>[PRJ-04]</span> CAPEX PROPOSAL</span>
-            <span class="tag-pill">Plant Layout</span>
-          </div>
-          <div class="project-body">
-            <h3 class="project-title">New Steel Plant Budgetary Proposal</h3>
-            <p class="project-desc">End-to-end plant layout, equipment sizing (slitting/CTL lines), and CAPEX estimation for a 45,000 m² greenfield processing facility.</p>
-            
-            <div class="project-metrics-row">
-              <div class="project-metric">45,000 m² Area</div>
-              <div class="project-metric">3 Process Lines</div>
-              <div class="project-metric">25T EOT Cranes</div>
-            </div>
-            
-            <div class="project-tech-tags">
-              <span class="tech-tag">AutoCAD</span>
-              <span class="tech-tag">CAPEX Costing</span>
-              <span class="tech-tag">Vendor Matrix</span>
-            </div>
-            
-            <div class="project-actions">
-              <button class="btn btn-secondary btn-sm view-case-study" data-project="steel_plant">View Architecture</button>
-              <button class="btn btn-primary btn-sm" onclick="document.querySelector('[data-cmd=\\'steel-plant-quote\\']').click(); document.querySelector('#architecture').scrollIntoView({behavior: 'smooth'})">Run Sim</button>
-            </div>
-          </div>
-        </article>
-
-      </div>
-    </section>
-
-    <!-- ================= SKILLS & SIMULATOR ================= -->
-    <section id="architecture" class="section-wrapper">
-      <div class="section-header reveal-on-scroll">
-        <span class="section-eyebrow">Skills & Capabilities</span>
-        <h2 class="section-title">Design Stack & Simulation.</h2>
-        <p class="section-description">
-          A blend of advanced 3D modelling, structural FEA simulation, and interactive engineering calculations.
-        </p>
-      </div>
-
-      <div class="bento-grid">
-        
-        <!-- Domains Matrix -->
-        <div class="bento-card bento-span-8 reveal-on-scroll">
-          <div class="bento-header">
-            <h3 class="bento-title"><span class="bento-icon">🔧</span> Tooling & Competencies</h3>
-          </div>
-          
-          <div class="skill-domain-group">
-            <div class="skill-domain-label">Design & Modelling</div>
-            <div class="skill-pills-row">
-              <div class="skill-pill"><div class="skill-pill-dot"></div> SolidWorks 3D</div>
-              <div class="skill-pill"><div class="skill-pill-dot"></div> AutoCAD 2D</div>
-              <div class="skill-pill"><div class="skill-pill-dot"></div> KeyShot Rendering</div>
-              <div class="skill-pill"><div class="skill-pill-dot"></div> Large Assembly Management</div>
-            </div>
-          </div>
-
-          <div class="skill-domain-group">
-            <div class="skill-domain-label">Engineering Analysis</div>
-            <div class="skill-pills-row">
-              <div class="skill-pill"><div class="skill-pill-dot"></div> ANSYS APDL</div>
-              <div class="skill-pill"><div class="skill-pill-dot"></div> SolidWorks Simulation</div>
-              <div class="skill-pill"><div class="skill-pill-dot"></div> Motor & Drive Sizing</div>
-              <div class="skill-pill"><div class="skill-pill-dot"></div> Pneumatic/Hydraulic Selection</div>
-            </div>
-          </div>
-
-          <div class="skill-domain-group">
-            <div class="skill-domain-label">Documentation & Management</div>
-            <div class="skill-pills-row">
-              <div class="skill-pill"><div class="skill-pill-dot"></div> ASME Y14.5M (GD&T)</div>
-              <div class="skill-pill"><div class="skill-pill-dot"></div> BOM Generation</div>
-              <div class="skill-pill"><div class="skill-pill-dot"></div> CAPEX Budgeting</div>
-              <div class="skill-pill"><div class="skill-pill-dot"></div> Site Installation & Commissioning</div>
-            </div>
-          </div>
+      <!-- ====================================================================
+           PROJECTS SECTION
+           ==================================================================== -->
+      <section class="section-wrapper" id="projects">
+        <div class="section-header reveal-on-scroll">
+          <span class="section-eyebrow">// Engineering Portfolio</span>
+          <h2 class="section-title">Machinery, Equipment &amp; Systems</h2>
+          <p class="section-description">
+            Production-proven mechanical assemblies, MHE systems, air cargo handling equipment, and FEA analysis for real-world applications.
+          </p>
         </div>
 
-        <!-- Metric Pulse -->
-        <div class="bento-card bento-span-4 reveal-on-scroll" style="transition-delay: 0.1s;">
-          <div class="bento-header">
-            <h3 class="bento-title"><span class="bento-icon">⚡</span> Execution Stats</h3>
-          </div>
-          <div class="heartbeat-grid">
-            <div class="heartbeat-box">
-              <div class="heartbeat-val">>98%</div>
-              <div class="heartbeat-label">Design Accuracy</div>
-            </div>
-            <div class="heartbeat-box">
-              <div class="heartbeat-val">15%</div>
-              <div class="heartbeat-label">Install Time Saved</div>
-            </div>
-            <div class="heartbeat-box">
-              <div class="heartbeat-val">3.2+</div>
-              <div class="heartbeat-label">Avg. Safety Factor</div>
-            </div>
-            <div class="heartbeat-box">
-              <div class="heartbeat-val">100%</div>
-              <div class="heartbeat-label">FAI Pass Rate</div>
-            </div>
-          </div>
+        <!-- Filter Buttons -->
+        <div class="project-filters reveal-on-scroll">
+          <button class="filter-btn active" data-filter="all">All Projects (6)</button>
+          <button class="filter-btn" data-filter="cargo">Air Cargo &amp; MHE</button>
+          <button class="filter-btn" data-filter="spm">Special Purpose Machinery</button>
+          <button class="filter-btn" data-filter="plant">Plant Proposals</button>
+          <button class="filter-btn" data-filter="fea">FEA &amp; Analysis</button>
         </div>
 
-        <!-- Terminal Sandbox -->
-        <div class="bento-card bento-span-12 reveal-on-scroll">
-          <div class="bento-header" style="margin-bottom: 1rem;">
-            <h3 class="bento-title"><span class="bento-icon">💻</span> Engineering Command Terminal</h3>
-            <span class="tag-pill">Interactive FEA/Calculations</span>
-          </div>
-          
-          <div class="terminal-window">
-            <div class="terminal-header">
-              <div class="terminal-dots">
-                <div class="terminal-dot dot-red"></div>
-                <div class="terminal-dot dot-yellow"></div>
-                <div class="terminal-dot dot-green"></div>
-              </div>
-              <div class="terminal-title">kap-eng-terminal ~ bash</div>
+        <!-- Projects Grid -->
+        <div class="projects-grid" id="projects-grid">
+
+          <!-- Project 1: Air Cargo Decks -->
+          <article class="project-card reveal-on-scroll" data-category="cargo" data-project-id="air_cargo">
+            <div class="project-card-header">
+              <span class="project-code-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                SYS-GSE-01
+              </span>
+              <span class="cad-badge">Air Cargo GSE</span>
             </div>
-            <div class="terminal-body" id="sandbox-terminal-output">
-              <div class="terminal-line">
-                <span class="terminal-prompt">kap@system:~$</span>
-                <span class="terminal-output"> initializing engineering simulation sandbox...</span>
+            <div class="project-body">
+              <h3 class="project-title">
+                <span>Air Cargo Powered Roller &amp; Castor Deck</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+              </h3>
+              <p class="project-desc">Heavy-capacity GSE for wide-body aircraft ULDs. Motorized powered roller decks with bidirectional stops and omnidirectional Lazy Dolly Castor Deck matrix with heavy-duty ball castors at 55mm pitch for uniform load distribution.</p>
+              <div class="project-metrics-row">
+                <span class="project-metric">7,000 kg ULD Load</span>
+                <span class="project-metric">0.35 m/s Drive</span>
+                <span class="project-metric">IATA / AHM Compliant</span>
               </div>
-              <div class="terminal-line">
-                <span class="terminal-prompt">kap@system:~$</span>
-                <span class="terminal-output"> ready. click a command below to run.</span>
+              <div class="project-tech-tags">
+                <span class="tech-tag">SolidWorks 3D</span>
+                <span class="tech-tag">AutoCAD Layout</span>
+                <span class="tech-tag">Motor Drive Sizing</span>
+                <span class="tech-tag">Ball Castor Matrix</span>
+              </div>
+              <div class="project-actions">
+                <button class="btn btn-primary btn-sm view-case-study" data-project="air_cargo">Case Study</button>
+                <button class="btn btn-secondary btn-sm copy-link-btn" data-link="Air Cargo GSE: 7,000kg Dynamic ULD, 0.35m/s Motorized, 55mm Castor Pitch">Spec Sheet</button>
               </div>
             </div>
-            <div class="terminal-controls">
-              <button class="term-cmd-btn" data-cmd="calc-air-cargo">> air-cargo-stress</button>
-              <button class="term-cmd-btn" data-cmd="strip-tonnage">> strip-level-force</button>
-              <button class="term-cmd-btn" data-cmd="t-spacer-cycle">> t-spacer-cycle</button>
-              <button class="term-cmd-btn" data-cmd="steel-plant-quote">> capex-plant-quote</button>
-              <button class="term-cmd-btn" data-cmd="clear" style="margin-left: auto;">> clear</button>
+          </article>
+
+          <!-- Project 2: Strip Flattening Machine -->
+          <article class="project-card reveal-on-scroll" data-category="spm" data-project-id="strip_flattening">
+            <div class="project-card-header">
+              <span class="project-code-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                SPM-FLAT-02
+              </span>
+              <span class="cad-badge">Automated SPM</span>
             </div>
-          </div>
+            <div class="project-body">
+              <h3 class="project-title">
+                <span>Industrial Strip Flattening Machine</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+              </h3>
+              <p class="project-desc">Continuous steel strip leveling machine to eliminate coil set and cross-bow in high-tensile sheet metal. 17-roll precision cassette with synchronized hydraulic downforce cylinders delivering 80 kN and dual planetary gear reduction.</p>
+              <div class="project-metrics-row">
+                <span class="project-metric">1,200 mm Strip Width</span>
+                <span class="project-metric">6 mm Steel Gauge</span>
+                <span class="project-metric">80 kN Downforce</span>
+              </div>
+              <div class="project-tech-tags">
+                <span class="tech-tag">Large Assembly CAD</span>
+                <span class="tech-tag">Hydraulic Cylinder Sizing</span>
+                <span class="tech-tag">Bearing Calculation</span>
+                <span class="tech-tag">DFM / DFA</span>
+              </div>
+              <div class="project-actions">
+                <button class="btn btn-primary btn-sm view-case-study" data-project="strip_flattening">Case Study</button>
+                <button class="btn btn-secondary btn-sm copy-link-btn" data-link="Strip Flattening: 17-Roll Cassette, 80kN Hydraulic, 1200mm Width">Hydraulic Spec</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Project 3: T-Spacer Cutting Machine -->
+          <article class="project-card reveal-on-scroll" data-category="spm" data-project-id="t_spacer">
+            <div class="project-card-header">
+              <span class="project-code-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                SPM-CUT-03
+              </span>
+              <span class="cad-badge">Precision SPM</span>
+            </div>
+            <div class="project-body">
+              <h3 class="project-title">
+                <span>Automated T-Spacer Cutting Machine</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+              </h3>
+              <p class="project-desc">High-speed automated SPM for precision cutting of insulating glass T-spacers. Servo ball screw indexing, dual pneumatic clamping jaws, high-speed carbide circular blade, and automatic chip vacuum extraction.</p>
+              <div class="project-metrics-row">
+                <span class="project-metric">± 0.05 mm Tolerance</span>
+                <span class="project-metric">1.8 sec Cycle Time</span>
+                <span class="project-metric">94% Material Yield</span>
+              </div>
+              <div class="project-tech-tags">
+                <span class="tech-tag">Linear Servo Feeds</span>
+                <span class="tech-tag">Pneumatic Clamping</span>
+                <span class="tech-tag">AutoCAD Shop Drawings</span>
+                <span class="tech-tag">Safety Enclosure</span>
+              </div>
+              <div class="project-actions">
+                <button class="btn btn-primary btn-sm view-case-study" data-project="t_spacer">Case Study</button>
+                <button class="btn btn-secondary btn-sm copy-link-btn" data-link="T-Spacer SPM: 1.8s Cycle, ±0.05mm Servo Accuracy, Pneumatic Clamp">Cycle Study</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Project 4: Steel Plant Budgetary Proposal -->
+          <article class="project-card reveal-on-scroll" data-category="plant" data-project-id="steel_plant">
+            <div class="project-card-header">
+              <span class="project-code-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                PROP-STEEL-04
+              </span>
+              <span class="cad-badge">Budgetary Proposal</span>
+            </div>
+            <div class="project-body">
+              <h3 class="project-title">
+                <span>Budgetary Proposal for Steel Plant Equipment</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+              </h3>
+              <p class="project-desc">Comprehensive budgetary proposal and CAPEX estimation for steel manufacturing machinery. 2D/3D plant layouts, material handling logistics, overhead crane clearance envelopes, and equipment installation sequencing.</p>
+              <div class="project-metrics-row">
+                <span class="project-metric">Turnkey CAPEX Estimate</span>
+                <span class="project-metric">25T Crane Integration</span>
+                <span class="project-metric">45,000 m² Layout</span>
+              </div>
+              <div class="project-tech-tags">
+                <span class="tech-tag">AutoCAD Plant Layout</span>
+                <span class="tech-tag">Cost Modelling</span>
+                <span class="tech-tag">Crane Envelopes</span>
+                <span class="tech-tag">Civil/Mech Interfaces</span>
+              </div>
+              <div class="project-actions">
+                <button class="btn btn-primary btn-sm view-case-study" data-project="steel_plant">Case Study</button>
+                <button class="btn btn-secondary btn-sm copy-link-btn" data-link="Steel Plant Proposal: Processing lines, Slitter, Leveling, 25T Crane Coverage">Budget Breakdown</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Project 5: FEA & Load Testing -->
+          <article class="project-card reveal-on-scroll" data-category="fea" data-project-id="load_analysis">
+            <div class="project-card-header">
+              <span class="project-code-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                FEA-TEST-05
+              </span>
+              <span class="cad-badge">FEA &amp; Proof Test</span>
+            </div>
+            <div class="project-body">
+              <h3 class="project-title">
+                <span>FEA Stress Simulation &amp; Real-Life Load Testing</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+              </h3>
+              <p class="project-desc">Structural verification combining digital Von Mises FEA (stress, strain, deflection) with physical proof load testing using calibrated hydraulic rams and strain gauges to certify factor of safety.</p>
+              <div class="project-metrics-row">
+                <span class="project-metric">1.5x Dynamic Proof Tested</span>
+                <span class="project-metric">FoS &gt; 3.2 Certified</span>
+                <span class="project-metric">Deflection &lt; L/850</span>
+              </div>
+              <div class="project-tech-tags">
+                <span class="tech-tag">SolidWorks Simulation</span>
+                <span class="tech-tag">ANSYS APDL</span>
+                <span class="tech-tag">Strain Gauge Testing</span>
+                <span class="tech-tag">Von Mises Criteria</span>
+              </div>
+              <div class="project-actions">
+                <button class="btn btn-primary btn-sm view-case-study" data-project="load_analysis">Case Study</button>
+                <button class="btn btn-secondary btn-sm copy-link-btn" data-link="FEA Protocol: S355JR Steel, 105kN Proof Overload, 1.42mm Deflection">Stress Report</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Project 6: MHE Mezzanine Design -->
+          <article class="project-card reveal-on-scroll" data-category="cargo" data-project-id="autocad_proposals">
+            <div class="project-card-header">
+              <span class="project-code-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                MHE-MZNE-06
+              </span>
+              <span class="cad-badge">MHE &amp; GSE Design</span>
+            </div>
+            <div class="project-body">
+              <h3 class="project-title">
+                <span>MHE Cargo Terminal Mezzanine Floor Design</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+              </h3>
+              <p class="project-desc">Design and development of Material Handling Equipment (MHE) for a cargo terminal mezzanine floor, supporting full workflow from design through manufacturing to site installation. Reduced installation time by 15% through coordinated documentation.</p>
+              <div class="project-metrics-row">
+                <span class="project-metric">15% Install Time Reduction</span>
+                <span class="project-metric">20% Cost Reduction (PoC)</span>
+                <span class="project-metric">100% FAI Pass</span>
+              </div>
+              <div class="project-tech-tags">
+                <span class="tech-tag">AutoCAD 2D Drawings</span>
+                <span class="tech-tag">ASME Y14.5M GD&amp;T</span>
+                <span class="tech-tag">BOM Generation</span>
+                <span class="tech-tag">Site Installation Support</span>
+              </div>
+              <div class="project-actions">
+                <button class="btn btn-primary btn-sm view-case-study" data-project="autocad_proposals">Case Study</button>
+                <button class="btn btn-secondary btn-sm copy-link-btn" data-link="MHE Mezzanine: ASME Y14.5M, Full BOM, Site Commissioning">Drawing Package</button>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SKILLS & TOOLS BENTO GRID
+           ==================================================================== -->
+      <section class="section-wrapper" id="architecture">
+        <div class="section-header reveal-on-scroll">
+          <span class="section-eyebrow">// Technical Competencies</span>
+          <h2 class="section-title">Design Tools, Skills &amp; Analysis Sandbox</h2>
+          <p class="section-description">
+            Core CAD software stack, simulation capabilities, and an interactive mechanical load calculation engine.
+          </p>
         </div>
 
-      </div>
-    </section>
+        <div class="bento-grid">
 
-    <!-- ================= EXPERIENCE ================= -->
-    <section id="experience" class="section-wrapper">
-      <div class="section-header reveal-on-scroll">
-        <span class="section-eyebrow">Career Path</span>
-        <h2 class="section-title">Professional Experience.</h2>
-        <p class="section-description">
-          A track record of delivering high-stakes mechanical designs, leading technical proposals, and ensuring flawless site execution.
-        </p>
-      </div>
+          <!-- CAD Software Stack -->
+          <div class="bento-card bento-span-8 reveal-on-scroll">
+            <div class="bento-header">
+              <h3 class="bento-title">
+                <span class="bento-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </span>
+                <span>Technical Skills &amp; Software Stack</span>
+              </h3>
+              <span class="tag-pill mono">Production Proven</span>
+            </div>
 
-      <div class="timeline">
-        
-        <div class="timeline-item reveal-on-scroll">
-          <div class="timeline-node"></div>
-          <div class="timeline-card">
-            <div class="timeline-top">
+            <div class="skill-domain-group">
+              <h4 class="skill-domain-label">CAD &amp; Design</h4>
+              <div class="skill-pills-row">
+                <span class="skill-pill"><span class="skill-pill-dot"></span>AutoCAD (Plant Layouts &amp; Shop Drawings)</span>
+                <span class="skill-pill"><span class="skill-pill-dot"></span>SolidWorks (Large Assembly &amp; Part Design)</span>
+                <span class="skill-pill"><span class="skill-pill-dot"></span>3D Modelling &amp; Assembly Modelling</span>
+                <span class="skill-pill"><span class="skill-pill-dot"></span>Sheet Metal Design &amp; Weldments</span>
+                <span class="skill-pill"><span class="skill-pill-dot"></span>GD&amp;T (ASME Y14.5M)</span>
+              </div>
+            </div>
+
+            <div class="skill-domain-group">
+              <h4 class="skill-domain-label">Engineering Analysis</h4>
+              <div class="skill-pills-row">
+                <span class="skill-pill"><span class="skill-pill-dot" style="background:var(--accent-primary);"></span>ANSYS (Mechanical APDL)</span>
+                <span class="skill-pill"><span class="skill-pill-dot" style="background:var(--accent-primary);"></span>Static Structural Analysis &amp; Meshing</span>
+                <span class="skill-pill"><span class="skill-pill-dot" style="background:var(--accent-primary);"></span>SolidWorks Motion Analysis</span>
+                <span class="skill-pill"><span class="skill-pill-dot" style="background:var(--accent-primary);"></span>Hydraulic &amp; Pneumatic Circuit Design</span>
+              </div>
+            </div>
+
+            <div class="skill-domain-group">
+              <h4 class="skill-domain-label">Engineering Documentation</h4>
+              <div class="skill-pills-row">
+                <span class="skill-pill"><span class="skill-pill-dot"></span>Engineering &amp; Manufacturing Drawings</span>
+                <span class="skill-pill"><span class="skill-pill-dot"></span>Bill of Materials (BOM) Generation</span>
+                <span class="skill-pill"><span class="skill-pill-dot"></span>Dimensional Inspection &amp; Tolerances</span>
+                <span class="skill-pill"><span class="skill-pill-dot"></span>Design Verification &amp; FAI Reports</span>
+                <span class="skill-pill"><span class="skill-pill-dot"></span>Microsoft Office Suite</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Design Parameters -->
+          <div class="bento-card bento-span-4 reveal-on-scroll">
+            <div class="bento-header">
+              <h3 class="bento-title">
+                <span class="bento-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </span>
+                <span>Design Parameters</span>
+              </h3>
+              <span class="cad-badge">VERIFIED</span>
+            </div>
+
+            <div class="heartbeat-grid">
+              <div class="heartbeat-box">
+                <div class="heartbeat-val">3.2 FoS</div>
+                <div class="heartbeat-label">Safety Factor</div>
+              </div>
+              <div class="heartbeat-box">
+                <div class="heartbeat-val">1.42 mm</div>
+                <div class="heartbeat-label">Max Deflection</div>
+              </div>
+              <div class="heartbeat-box">
+                <div class="heartbeat-val">355 MPa</div>
+                <div class="heartbeat-label">Yield Strength</div>
+              </div>
+              <div class="heartbeat-box">
+                <div class="heartbeat-val">±0.05 mm</div>
+                <div class="heartbeat-label">Cut Tolerance</div>
+              </div>
+            </div>
+
+            <div style="margin-top:1.25rem;padding:0.85rem;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-subtle);">
+              <div style="display:flex;justify-content:space-between;font-size:0.76rem;margin-bottom:0.4rem;">
+                <span class="mono text-muted">Drawing Standard:</span>
+                <span class="mono text-accent">ASME Y14.5M</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:0.76rem;">
+                <span class="mono text-muted">Tolerance Grade:</span>
+                <span class="mono text-accent">ISO 2768-mK</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- FEA Load Simulator Terminal -->
+          <div class="bento-card bento-span-8 reveal-on-scroll">
+            <div class="bento-header">
+              <h3 class="bento-title">
+                <span class="bento-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                </span>
+                <span>Interactive Mechanical &amp; FEA Load Simulator</span>
+              </h3>
+              <span class="tag-pill mono">Live Solver</span>
+            </div>
+
+            <p style="font-size:0.83rem;color:var(--text-secondary);margin-bottom:1rem;">
+              Real-time engineering calculations for cargo deck loading, strip flattening tonnage, T-spacer cycle times, and plant equipment proposals.
+            </p>
+
+            <div class="terminal-window">
+              <div class="terminal-header">
+                <div class="terminal-dots">
+                  <span class="terminal-dot dot-red"></span>
+                  <span class="terminal-dot dot-yellow"></span>
+                  <span class="terminal-dot dot-green"></span>
+                </div>
+                <div class="terminal-title">pranav@design-workstation: ~/simulations/fea-solver</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);">solver-v4.2</div>
+              </div>
+              <div class="terminal-body" id="sandbox-terminal-output">
+                <div class="terminal-line"><span class="terminal-prompt">&gt;&gt;</span><span class="terminal-output"> FEA &amp; Machine Design Solver initialized. Select a routine below.</span></div>
+                <div class="terminal-line"><span class="terminal-prompt">&gt;&gt;</span><span class="terminal-output"> load-parameters --active</span></div>
+                <div class="terminal-line"><span class="terminal-highlight">Active Models:</span> MHE Cargo Deck · Strip Leveler · T-Spacer SPM · Plant Equipment</div>
+                <div class="terminal-line"><span class="terminal-highlight">Material:</span> S355JR Structural Steel (E = 210 GPa, Yield = 355 MPa)</div>
+                <div class="terminal-line"><span class="terminal-success">✓ Solver ready for stress and cycle time computations.</span></div>
+              </div>
+              <div class="terminal-controls">
+                <button class="term-cmd-btn" data-cmd="calc-air-cargo">🛫 Cargo Deck Load (7,000 kg)</button>
+                <button class="term-cmd-btn" data-cmd="strip-tonnage">🦾 Strip Flattening (6mm)</button>
+                <button class="term-cmd-btn" data-cmd="t-spacer-cycle">⚡ T-Spacer Cycle Time</button>
+                <button class="term-cmd-btn" data-cmd="steel-plant-quote">🏗️ Steel Plant Proposal</button>
+                <button class="term-cmd-btn" data-cmd="clear">🧹 Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Design Thinking -->
+          <div class="bento-card bento-span-4 reveal-on-scroll">
+            <div class="bento-header">
+              <h3 class="bento-title">
+                <span class="bento-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                </span>
+                <span>Engineering Approach</span>
+              </h3>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:1.1rem;">
               <div>
-                <h3 class="timeline-role">Mechanical Design Engineer</h3>
-                <div class="timeline-company">Industrial Machinery & Automation Corp.</div>
+                <h4 style="font-size:0.9rem;color:var(--text-highlight);margin-bottom:0.22rem;font-weight:700;">1. Design for Manufacturability</h4>
+                <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.55;">Creating assemblies with DFM principles — minimizing machining complexity, enabling jig-free assembly, and reducing part count for cost efficiency.</p>
               </div>
-              <div class="timeline-period">Present</div>
-            </div>
-            <div class="timeline-highlights">
-              <div class="timeline-bullet">Spearheaded the design of high-speed SPMs including <strong>T-spacer cutting machines</strong> and <strong>Strip Flattening Lines</strong> from blank canvas to production.</div>
-              <div class="timeline-bullet">Led the engineering proposal for a <strong>45,000 m² steel plant</strong>, specifying slitting lines, CTL lines, and coordinating civil interface drawings.</div>
-              <div class="timeline-bullet">Conducted rigid FEA and proof load testing on structural components, certifying designs to <strong>Factor of Safety > 3.2</strong>.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="timeline-item reveal-on-scroll">
-          <div class="timeline-node"></div>
-          <div class="timeline-card">
-            <div class="timeline-top">
               <div>
-                <h3 class="timeline-role">Design Engineer (MHE & GSE)</h3>
-                <div class="timeline-company">Aviation Logistics Engineering Ltd.</div>
+                <h4 style="font-size:0.9rem;color:var(--text-highlight);margin-bottom:0.22rem;font-weight:700;">2. FEA + Physical Proof Testing</h4>
+                <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.55;">Validating digital Von Mises simulations against real-life hydraulic strain gauge tests to guarantee safety under 1.5× dynamic shock loads.</p>
               </div>
-              <div class="timeline-period">2020 — 2023</div>
-            </div>
-            <div class="timeline-highlights">
-              <div class="timeline-bullet">Designed <strong>Lazy Dolly Castor Decks</strong> and <strong>Powered Roller Decks</strong> for wide-body aircraft cargo ULDs (up to 7,000 kg capacity).</div>
-              <div class="timeline-bullet">Created detailed manufacturing drawings utilizing <strong>ASME Y14.5M GD&T</strong> standards, dramatically reducing rework.</div>
-              <div class="timeline-bullet">Provided hands-on site installation support and commissioning modifications, cutting installation time by <strong>15%</strong>.</div>
-            </div>
-          </div>
-        </div>
-        
-      </div>
-    </section>
-
-    <!-- ================= DOCUMENTATION & DRAFTING ================= -->
-    <section id="documentation" class="section-wrapper">
-      <div class="section-header reveal-on-scroll">
-        <span class="section-eyebrow">Documentation</span>
-        <h2 class="section-title">Technical Drafting.</h2>
-        <p class="section-description">
-          Clear, unambiguous manufacturing drawings and inspection reports are the foundation of quality engineering.
-        </p>
-      </div>
-
-      <div class="doc-grid">
-        <div class="doc-card reveal-on-scroll" data-project="autocad_proposals">
-          <div class="doc-icon">📐</div>
-          <h3 class="doc-title">AutoCAD Layouts</h3>
-          <p class="doc-desc">Extensive 2D general arrangement and plant layout drawings, complete with crane clearance envelopes and civil pit interfaces.</p>
-          <button class="btn btn-secondary btn-sm" style="margin-top: auto;">View Process</button>
-        </div>
-
-        <div class="doc-card reveal-on-scroll" style="transition-delay: 0.1s;" data-project="load_analysis">
-          <div class="doc-icon">📊</div>
-          <h3 class="doc-title">FEA & Proof Testing</h3>
-          <p class="doc-desc">Documented SolidWorks Simulation / ANSYS stress reports correlated against physical rosette strain gauge and hydraulic ram proof tests.</p>
-          <button class="btn btn-secondary btn-sm" style="margin-top: auto;">View Report</button>
-        </div>
-
-        <div class="doc-card reveal-on-scroll" style="transition-delay: 0.2s;">
-          <div class="doc-icon">📋</div>
-          <h3 class="doc-title">GD&T & BOMs</h3>
-          <p class="doc-desc">Strict adherence to ASME Y14.5M for component drafting. Automated Bill of Materials extraction linked directly to ERP procurement.</p>
-          <button class="btn btn-secondary btn-sm copy-link-btn" data-link="ASME Y14.5M Drafting Template" style="margin-top: auto;">Copy Spec</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= CONTACT ================= -->
-    <section id="contact" class="section-wrapper contact-section reveal-on-scroll">
-      <div class="contact-grid">
-        <div class="contact-info">
-          <span class="section-eyebrow">Get in Touch</span>
-          <h2 class="contact-info-title">Let's build<br>the next system.</h2>
-          <p class="contact-info-sub">Available for challenging mechanical design projects, equipment proposals, and structural FEA consulting.</p>
-          
-          <div class="contact-links">
-            <a href="mailto:pran.acharya.eng@gmail.com" class="contact-link-item">
-              <div class="contact-link-icon">📧</div>
-              <div class="contact-link-details">
-                <span class="contact-link-label">Email</span>
-                <span class="contact-link-value">pran.acharya.eng@gmail.com</span>
-              </div>
-            </a>
-            <div class="contact-link-item" style="cursor: default;">
-              <div class="contact-link-icon">📍</div>
-              <div class="contact-link-details">
-                <span class="contact-link-label">Location</span>
-                <span class="contact-link-value">Available Globally (Remote/Hybrid)</span>
+              <div>
+                <h4 style="font-size:0.9rem;color:var(--text-highlight);margin-bottom:0.22rem;font-weight:700;">3. Site Commissioning Agility</h4>
+                <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.55;">Rapid on-site redesign and redline adaptations to resolve civil foundation variances and equipment interface misalignments.</p>
               </div>
             </div>
           </div>
+
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           EXPERIENCE TIMELINE
+           ==================================================================== -->
+      <section class="section-wrapper" id="experience">
+        <div class="section-header reveal-on-scroll">
+          <span class="section-eyebrow">// Professional Journey</span>
+          <h2 class="section-title">Work Experience</h2>
+          <p class="section-description">
+            Hands-on track record in MHE design, automated machinery modelling, AutoCAD documentation, and site commissioning.
+          </p>
         </div>
 
-        <div class="contact-form-card">
-          <form id="contact-form">
-            <div class="form-group">
-              <label class="form-label" for="contact-name">Name / Organization</label>
-              <input type="text" id="contact-name" class="form-input" required placeholder="John Doe">
+        <div class="timeline">
+
+          <!-- Job 1: Swati Airport Support Services -->
+          <div class="timeline-item reveal-on-scroll">
+            <div class="timeline-node"></div>
+            <div class="timeline-card">
+              <div class="timeline-top">
+                <div>
+                  <h3 class="timeline-role">Design Engineer</h3>
+                  <div class="timeline-company">Swati Airport Support Services Pvt. Ltd.</div>
+                </div>
+                <span class="timeline-period">Oct 2025 – Present</span>
+              </div>
+              <ul class="timeline-highlights">
+                <li class="timeline-bullet">Worked on design and development of <strong>Material Handling Equipment (MHE)</strong> for a cargo terminal mezzanine floor, supporting activities from design through manufacturing to installation.</li>
+                <li class="timeline-bullet">Supported MHE installation activities and helped <strong>reduce installation time by 15%</strong> through coordination with design, manufacturing, and site teams.</li>
+                <li class="timeline-bullet">Built a <strong>Self Baggage Service Kiosk</strong> for an airport Proof of Concept (PoC), contributing to a design improvement with <strong>20% cost reduction</strong> from previous model.</li>
+                <li class="timeline-bullet">Collaborated with cross-functional teams in preparing <strong>budgetary quotations</strong> for various projects and supported ongoing project activities.</li>
+                <li class="timeline-bullet">Contributed to <strong>component and assembly inspection</strong> by checking parts against engineering drawings, dimensions, and specifications — improving installation efficiency by <strong>10%</strong>.</li>
+                <li class="timeline-bullet">Assisted in <strong>site installation support</strong> for various systems and resolved installation-related issues to ensure smooth project execution.</li>
+              </ul>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="contact-email">Email Address</label>
-              <input type="email" id="contact-email" class="form-input" required placeholder="john@company.com">
+          </div>
+
+          <!-- Job 2: Flawless Engineering Solutions -->
+          <div class="timeline-item reveal-on-scroll">
+            <div class="timeline-node"></div>
+            <div class="timeline-card">
+              <div class="timeline-top">
+                <div>
+                  <h3 class="timeline-role">Mechanical Design Engineer</h3>
+                  <div class="timeline-company">Flawless Engineering Solutions Pvt. Ltd. — Cherlapalli, Hyderabad</div>
+                </div>
+                <span class="timeline-period">Feb 2024 – Oct 2025</span>
+              </div>
+              <ul class="timeline-highlights">
+                <li class="timeline-bullet">Created detailed <strong>3D models</strong> for machine design components and assemblies, considering functionality, manufacturability, and ease of assembly.</li>
+                <li class="timeline-bullet">Prepared <strong>precision engineering drawings</strong> for manufacturing components, including dimensional requirements, tolerances, and GD&amp;T to improve manufacturing quality by <strong>30%</strong>.</li>
+                <li class="timeline-bullet">Generated detailed <strong>Bill of Materials (BOMs)</strong> and monitored manufacturing activities to improve the production process by <strong>20%</strong>.</li>
+                <li class="timeline-bullet">Worked closely with manufacturing and cross-functional teams to resolve design-related issues and support smooth project execution.</li>
+                <li class="timeline-bullet">Developed various <strong>machine component and assembly designs</strong> considering dimensions, operating principles, and project requirements under experienced engineers' guidance.</li>
+                <li class="timeline-bullet">Gained practical experience in <strong>hydraulic and pneumatic circuit design</strong>, including schematic development and understanding of system operation.</li>
+              </ul>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="contact-subject">Inquiry Type</label>
-              <input type="text" id="contact-subject" class="form-input" placeholder="e.g. Design Consulting, Job Opportunity">
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="contact-message">Message</label>
-              <textarea id="contact-message" class="form-textarea" required placeholder="Tell me about your project requirements..."></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Send Message</button>
-          </form>
+          </div>
+
         </div>
+
+        <!-- Education Card -->
+        <div class="edu-card reveal-on-scroll" style="margin-top:2.5rem;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:0.7rem;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.12em;color:var(--accent-primary);margin-bottom:0.5rem;">Education</div>
+              <h3 style="font-size:1.05rem;font-weight:700;color:var(--text-highlight);margin-bottom:0.25rem;">Bachelor of Technology in Mechanical Engineering</h3>
+              <div style="font-size:0.82rem;color:var(--text-secondary);">Anurag Group of Institutions (CVSR College of Engineering)</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+              <span class="timeline-period">Aug 2019 – Mar 2023</span>
+              <div style="margin-top:0.5rem;">
+                <span class="cad-badge">CGPA: 7.70 / 10</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           DOCUMENTATION / TOOLS CARDS
+           ==================================================================== -->
+      <section class="section-wrapper" id="documentation">
+        <div class="section-header reveal-on-scroll">
+          <span class="section-eyebrow">// Design Documentation &amp; Tools</span>
+          <h2 class="section-title">AutoCAD, GD&amp;T &amp; Quality Assurance</h2>
+          <p class="section-description">
+            From production drawings to inspection reports — complete documentation packages for manufacturing and commissioning.
+          </p>
+        </div>
+
+        <div class="doc-grid">
+          <div class="doc-card reveal-on-scroll" data-project="autocad_proposals">
+            <div class="doc-card-header">
+              <div>
+                <div class="doc-card-title">AutoCAD 2D Production Drawings</div>
+                <div class="doc-card-desc">Complete manufacturing drawing packages with ASME Y14.5M GD&amp;T callouts, weldment symbols, surface texture requirements, and datum reference frames.</div>
+              </div>
+              <div class="doc-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+              </div>
+            </div>
+            <div class="doc-card-footer">
+              <span>ASME Y14.5M · ISO 2768-mK</span>
+              <span class="text-accent">Drawing Package →</span>
+            </div>
+          </div>
+
+          <div class="doc-card reveal-on-scroll" data-project="load_analysis">
+            <div class="doc-card-header">
+              <div>
+                <div class="doc-card-title">Bill of Materials &amp; Inspection Reports</div>
+                <div class="doc-card-desc">Detailed BOMs with part numbers, quantities, and materials. First Article Inspection (FAI) sheets and dimensional inspection logs for quality verification.</div>
+              </div>
+              <div class="doc-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              </div>
+            </div>
+            <div class="doc-card-footer">
+              <span>FAI · BOM · Inspection Sheets</span>
+              <span class="text-accent">Quality Docs →</span>
+            </div>
+          </div>
+
+          <div class="doc-card reveal-on-scroll" data-project="steel_plant">
+            <div class="doc-card-header">
+              <div>
+                <div class="doc-card-title">Budgetary Quotations &amp; Plant Layouts</div>
+                <div class="doc-card-desc">Equipment sizing, CAPEX proposals, supplier comparison matrices, plant layouts with crane envelopes, and civil-mechanical interface documentation.</div>
+              </div>
+              <div class="doc-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+              </div>
+            </div>
+            <div class="doc-card-footer">
+              <span>CAPEX · Layout · Proposals</span>
+              <span class="text-accent">Budget Docs →</span>
+            </div>
+          </div>
+
+          <div class="doc-card reveal-on-scroll" data-project="t_spacer">
+            <div class="doc-card-header">
+              <div>
+                <div class="doc-card-title">Hydraulic &amp; Pneumatic Schematics</div>
+                <div class="doc-card-desc">Circuit design for hydraulic cylinders, pneumatic clamping systems, and actuator sizing calculations with safety valve and pressure relief documentation.</div>
+              </div>
+              <div class="doc-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+              </div>
+            </div>
+            <div class="doc-card-footer">
+              <span>Hydraulics · Pneumatics · Actuators</span>
+              <span class="text-accent">Schematics →</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           CONTACT SECTION
+           ==================================================================== -->
+      <section class="contact-section" id="contact">
+        <div class="contact-grid">
+          <!-- Info -->
+          <div class="contact-info reveal-on-scroll">
+            <div>
+              <span class="section-eyebrow">// Get In Touch</span>
+              <h2 class="contact-info-title">Let's Work Together</h2>
+            </div>
+            <p class="contact-info-sub">
+              Available for mechanical design roles, machine design projects, air cargo GSE engineering, and technical proposal work. Based in Hyderabad, India.
+            </p>
+
+            <div class="contact-links">
+              <!-- Email -->
+              <a href="mailto:acharyapranav1992@gmail.com" class="contact-link-item">
+                <div class="contact-link-icon">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </div>
+                <div class="contact-link-details">
+                  <span class="contact-link-label">Email</span>
+                  <span class="contact-link-value">acharyapranav1992@gmail.com</span>
+                </div>
+              </a>
+              <!-- Phone -->
+              <a href="tel:+917330819010" class="contact-link-item">
+                <div class="contact-link-icon">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9A16 16 0 0 0 15 16.09l.9-.88a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </div>
+                <div class="contact-link-details">
+                  <span class="contact-link-label">Phone</span>
+                  <span class="contact-link-value">+91 7330819010</span>
+                </div>
+              </a>
+              <!-- LinkedIn -->
+              <a href="https://linkedin.com/in/pranav-acharya-545033206" target="_blank" rel="noopener" class="contact-link-item">
+                <div class="contact-link-icon">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                </div>
+                <div class="contact-link-details">
+                  <span class="contact-link-label">LinkedIn</span>
+                  <span class="contact-link-value">pranav-acharya-545033206</span>
+                </div>
+              </a>
+              <!-- Location -->
+              <div class="contact-link-item" style="cursor:default;">
+                <div class="contact-link-icon">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <div class="contact-link-details">
+                  <span class="contact-link-label">Location</span>
+                  <span class="contact-link-value">Hyderabad, Telangana, India</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Form -->
+          <div class="contact-form-card reveal-on-scroll">
+            <h3 style="font-size:1rem;font-weight:700;color:var(--text-highlight);margin-bottom:1.5rem;">Send a Technical Enquiry</h3>
+            <form id="contact-form">
+              <div class="form-group">
+                <label class="form-label" for="contact-name">Your Name</label>
+                <input class="form-input" type="text" id="contact-name" name="name" placeholder="Your full name" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="contact-email">Email Address</label>
+                <input class="form-input" type="email" id="contact-email" name="email" placeholder="your@company.com" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="contact-subject">Project / Subject</label>
+                <input class="form-input" type="text" id="contact-subject" name="subject" placeholder="e.g. MHE Design Consultation">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="contact-message">Message</label>
+                <textarea class="form-textarea" id="contact-message" name="message" placeholder="Describe your project requirements or enquiry..." required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Send Enquiry
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <p>© 2025 Karampudi Acharya Pranav · Mechanical Design Engineer · Hyderabad, India</p>
+      <p style="margin-top:0.4rem;color:var(--border-medium);">acharyapranav1992@gmail.com · +91 7330819010</p>
+    </footer>
+
+  </div><!-- /app-container -->
+
+  <!-- ========================================================================
+       COMMAND PALETTE OVERLAY
+       ======================================================================== -->
+  <div class="cmd-overlay" id="cmd-overlay" role="dialog" aria-label="Engineering Command Palette">
+    <div class="cmd-box">
+      <div class="cmd-search-row">
+        <svg class="cmd-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="cmd-input" id="cmd-input" type="text" placeholder="Search engineering tools, sections, calculations…" autocomplete="off">
       </div>
-    </section>
+      <div class="cmd-results" id="cmd-results"></div>
+      <div class="cmd-footer">
+        <span class="cmd-hint"><kbd class="kbd-badge">↑↓</kbd> Navigate</span>
+        <span class="cmd-hint"><kbd class="kbd-badge">↵</kbd> Select</span>
+        <span class="cmd-hint"><kbd class="kbd-badge">Esc</kbd> Close</span>
+      </div>
+    </div>
+  </div>
 
-  </main>
+  <!-- ========================================================================
+       CASE STUDY MODAL
+       ======================================================================== -->
+  <div class="modal-overlay" id="modal-overlay" role="dialog" aria-label="Project Case Study">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div style="flex:1;">
+          <div class="modal-title" id="modal-title">Case Study</div>
+          <div class="modal-badge" id="modal-badge" style="margin-top:0.4rem;display:inline-block;"></div>
+        </div>
+        <button class="modal-close" id="modal-close" aria-label="Close modal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
 
-  <footer>
-    <p>Designed & Engineered by Karampudi Acharya Pranav. <br>Built with modern web technologies and high-performance HTML5 Canvas.</p>
-  </footer>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
 
-  <!-- Link app.js at the end -->
-  <script src="app.js"></script>
+  <!-- Three.js WebGL Engine -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>

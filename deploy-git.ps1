@@ -1,6 +1,6 @@
 # ==============================================================================
 # Git Deployment Script for Karampudi Acharya Pranav Portfolio
-# Email: pran.acharya.eng@gmail.com
+# Email: acharyapranav1992@gmail.com
 # ==============================================================================
 
 param(
@@ -28,7 +28,7 @@ Write-Host "==========================================================" -Foregro
 Write-Host "Configuring Git author identity..." -ForegroundColor Yellow
 
 & $gitExe config --global user.name "Karampudi Acharya Pranav"
-& $gitExe config --global user.email "pran.acharya.eng@gmail.com"
+& $gitExe config --global user.email "acharyapranav1992@gmail.com"
 
 Write-Host "Initializing Git repository..." -ForegroundColor Yellow
 if (-not (Test-Path ".git")) {
@@ -44,7 +44,7 @@ Write-Host "Creating initial commit..." -ForegroundColor Yellow
 & $gitExe branch -M main
 
 Write-Host "`n[SUCCESS] Local Git repository initialized and committed with:" -ForegroundColor Green
-Write-Host "  Author: Karampudi Acharya Pranav <pran.acharya.eng@gmail.com>" -ForegroundColor Green
+Write-Host "  Author: Karampudi Acharya Pranav <acharyapranav1992@gmail.com>" -ForegroundColor Green
 Write-Host "  Branch: main" -ForegroundColor Green
 
 if ($RepoUrl -ne "") {
