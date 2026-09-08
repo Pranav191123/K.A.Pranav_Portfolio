@@ -16,18 +16,17 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
 
   <!-- 3D WebGL Gear Engine Container -->
   <div id="three-canvas-container"></div>
 
-  <!-- Defense Lines Canvas Background -->
-  <canvas id="bg-canvas" class="absolute inset-0 z-0 opacity-50 pointer-events-none" style="width: 100vw; height: 100vh; position: fixed;"></canvas>
-  
-  <!-- Ambient background glow -->
-  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[60%] w-[800px] h-[500px] bg-red-600/10 rounded-full blur-[150px] pointer-events-none z-0" style="position: fixed;"></div>
+  <!-- Atmospheric Glow Orbs -->
+  <div class="bg-glow-orb orb-1"></div>
+  <div class="bg-glow-orb orb-2"></div>
+  <div class="bg-glow-orb orb-3"></div>
 
   <div class="app-container">
 
@@ -46,16 +45,7 @@
           </div>
         </a>
 
-        <!-- Nav Links -->
-        <nav>
-          <ul class="nav-links">
-            <li><a href="#hero"          class="nav-link active">Overview</a></li>
-            <li><a href="#projects"      class="nav-link">Projects</a></li>
-            <li><a href="#architecture"  class="nav-link">Skills &amp; Tools</a></li>
-            <li><a href="#experience"    class="nav-link">Experience</a></li>
-            <li><a href="#documentation" class="nav-link">Documentation</a></li>
-          </ul>
-        </nav>
+        <!-- Nav Links Removed -->
 
         <!-- Nav Actions -->
         <div class="nav-actions">
@@ -67,11 +57,7 @@
             <span class="kbd-badge" id="kbd-shortcut-label">⌘K</span>
           </button>
 
-          <!-- Light / Dark Toggle -->
-          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Light / Dark Mode" aria-label="Toggle Theme">
-            <svg id="theme-sun-icon"  width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-            <svg id="theme-moon-icon" style="display:none;" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          </button>
+        <!-- Light / Dark Toggle Removed -->
 
           <!-- Audio Toggle -->
           <button class="btn-icon audio-toggle" id="audio-toggle-btn" title="Toggle UI Audio Haptics" aria-label="Toggle Audio">
@@ -94,7 +80,34 @@
       </div>
     </header>
 
-
+    <!-- ======================================================================
+         GEAR TYPE SELECTOR TOOLBAR
+         ====================================================================== -->
+    <div class="gear-toolbar-container">
+      <div class="gear-toolbar">
+        <span class="gear-toolbar-label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Gear System:
+        </span>
+        <button class="gear-select-pill active" data-gear="all">⚙️ All Types</button>
+        <button class="gear-select-pill" data-gear="spur">🔩 Spur Gear</button>
+        <button class="gear-select-pill" data-gear="bevel">🔺 Bevel Gear</button>
+        <button class="gear-select-pill" data-gear="helical">〰️ Helical Gear</button>
+        <button class="gear-select-pill" data-gear="planetary">🌐 Planetary Gear</button>
+        <button class="gear-select-pill" data-gear="worm">⚡ Worm &amp; Shaft</button>
+      </div>
+      
+      <!-- Dynamic Gear Engineering Specs Panel -->
+      <div class="gear-specs-panel" id="gear-specs-panel" style="display: none;">
+        <div class="gear-specs-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+          <span>Design Parameters</span>
+        </div>
+        <div class="gear-specs-grid" id="gear-specs-grid">
+          <!-- Populated dynamically by JS -->
+        </div>
+      </div>
+    </div>
 
     <!-- Mobile Drawer -->
     <div class="mobile-drawer" id="mobile-drawer">
@@ -152,6 +165,10 @@
                 <span>Engineering Console</span>
                 <span class="kbd-badge">⌘K</span>
               </button>
+              <button class="btn btn-glow-crimson" id="hero-brief-btn">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Technical Brief</span>
+              </button>
             </div>
 
             <!-- Quantitative Metrics -->
@@ -180,17 +197,40 @@
             <div class="hud-header">
               <div class="hud-title">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                <span>Select Gear System</span>
+                <span>Engineering Competency Stack</span>
               </div>
+              <span class="cad-badge">VERIFIED</span>
             </div>
 
-            <div class="hud-specs-list" style="display: flex; flex-direction: column; gap: 0.5rem; padding-top: 1rem;">
-              <button class="gear-select-pill active" data-gear="all" style="width:100%; justify-content: flex-start;">⚙️ All Types</button>
-              <button class="gear-select-pill" data-gear="spur" style="width:100%; justify-content: flex-start;">🔩 Spur Gear</button>
-              <button class="gear-select-pill" data-gear="bevel" style="width:100%; justify-content: flex-start;">🔺 Bevel Gear</button>
-              <button class="gear-select-pill" data-gear="helical" style="width:100%; justify-content: flex-start;">〰️ Helical Gear</button>
-              <button class="gear-select-pill" data-gear="planetary" style="width:100%; justify-content: flex-start;">🌐 Planetary Gear</button>
-              <button class="gear-select-pill" data-gear="worm" style="width:100%; justify-content: flex-start;">⚡ Worm &amp; Shaft</button>
+            <div class="hud-specs-list">
+              <div class="hud-spec-item">
+                <span class="hud-spec-label">Current Role</span>
+                <span class="hud-spec-value">Design Engineer @ Swati Airport</span>
+              </div>
+              <div class="hud-spec-item">
+                <span class="hud-spec-label">3D Modelling</span>
+                <span class="hud-spec-value">SolidWorks · Autodesk Inventor</span>
+              </div>
+              <div class="hud-spec-item">
+                <span class="hud-spec-label">2D Drafting &amp; GD&amp;T</span>
+                <span class="hud-spec-value">AutoCAD · ASME Y14.5M</span>
+              </div>
+              <div class="hud-spec-item">
+                <span class="hud-spec-label">FEA &amp; Simulation</span>
+                <span class="hud-spec-value">ANSYS · SolidWorks Simulation</span>
+              </div>
+              <div class="hud-spec-item">
+                <span class="hud-spec-label">Specialisation</span>
+                <span class="hud-spec-value">MHE · Air Cargo GSE · SPM</span>
+              </div>
+              <div class="hud-spec-item">
+                <span class="hud-spec-label">Education</span>
+                <span class="hud-spec-value">B.Tech Mechanical · CGPA 7.70</span>
+              </div>
+              <div class="hud-spec-item">
+                <span class="hud-spec-label">Documentation</span>
+                <span class="hud-spec-value">BOM · Inspection · GD&amp;T Sheets</span>
+              </div>
             </div>
 
             <!-- Gear System Indicator -->
@@ -900,6 +940,6 @@
 
   <!-- Three.js WebGL Engine -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>
