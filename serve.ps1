@@ -1,49 +1,49 @@
-$port = 8080
+$port = 8888
+$path = "c:\Users\KarampudiAcharyaPran\.gemini\antigravity-ide\scratch\high-profile-portfolio"
+
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://localhost:$port/")
 $listener.Start()
-Write-Host "HTTP Server listening on http://localhost:$port/"
-
-$baseDir = $PSScriptRoot
-$mime = @{
-    ".html" = "text/html; charset=utf-8"
-    ".css"  = "text/css; charset=utf-8"
-    ".js"   = "application/javascript; charset=utf-8"
-    ".jpg"  = "image/jpeg"
-    ".jpeg" = "image/jpeg"
-    ".png"  = "image/png"
-    ".svg"  = "image/svg+xml"
-    ".txt"  = "text/plain; charset=utf-8"
-    ".json" = "application/json; charset=utf-8"
-}
+Write-Host "Server running at http://localhost:$port/"
+Write-Host "Press Ctrl+C to stop."
 
 try {
     while ($listener.IsListening) {
         $context = $listener.GetContext()
-        $request = $context.Request
-        $response = $context.Response
-
-        $urlPath = $request.Url.LocalPath
-        if ($urlPath -eq "/" -or [string]::IsNullOrWhiteSpace($urlPath)) { 
-            $urlPath = "/index.html" 
-        }
+        $requestUrl = $context.Request.Url.LocalPath
+        if ($requestUrl -eq "/") { $requestUrl = "/index.html" }
         
-        $relPath = $urlPath.TrimStart("/").Replace("/", "\")
-        $filePath = Join-Path $baseDir $relPath
-
+        # Strip query string from file path
+        $cleanPath = $requestUrl -replace '\?.*$', ''
+        $filePath = Join-Path $path $cleanPath.Replace("/", "\")
+        $response = $context.Response
+        
+        # Add cache-control headers to prevent caching
+        $response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate")
+        $response.Headers.Add("Pragma", "no-cache")
+        $response.Headers.Add("Expires", "0")
+        
         if (Test-Path $filePath -PathType Leaf) {
             $ext = [System.IO.Path]::GetExtension($filePath).ToLower()
-            $contentType = if ($mime.ContainsKey($ext)) { $mime[$ext] } else { "application/octet-stream" }
-            $response.ContentType = $contentType
-            $bytes = [System.IO.File]::ReadAllBytes($filePath)
-            $response.ContentLength64 = $bytes.Length
-            $response.OutputStream.Write($bytes, 0, $bytes.Length)
+            $mimeType = switch ($ext) {
+                ".html" { "text/html; charset=utf-8" }
+                ".css"  { "text/css; charset=utf-8" }
+                ".js"   { "application/javascript; charset=utf-8" }
+                ".svg"  { "image/svg+xml" }
+                ".png"  { "image/png" }
+                ".jpg"  { "image/jpeg" }
+                default { "application/octet-stream" }
+            }
+            $response.ContentType = $mimeType
+            
+            $fileStream = [System.IO.File]::OpenRead($filePath)
+            $response.ContentLength64 = $fileStream.Length
+            $fileStream.CopyTo($response.OutputStream)
+            $fileStream.Close()
         } else {
             $response.StatusCode = 404
-            $err = [System.Text.Encoding]::UTF8.GetBytes("404 Not Found")
-            $response.OutputStream.Write($err, 0, $err.Length)
         }
-        $response.OutputStream.Close()
+        $response.Close()
     }
 } finally {
     $listener.Stop()

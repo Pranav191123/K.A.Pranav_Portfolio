@@ -61,12 +61,14 @@ function applyTheme(theme) {
   localStorage.setItem('kap-theme', theme);
   const sunIcon  = $('#theme-sun-icon');
   const moonIcon = $('#theme-moon-icon');
-  if (theme === 'dark') {
-    sunIcon.style.display  = '';
-    moonIcon.style.display = 'none';
-  } else {
-    sunIcon.style.display  = 'none';
-    moonIcon.style.display = '';
+  if (sunIcon && moonIcon) {
+    if (theme === 'dark') {
+      sunIcon.style.display  = '';
+      moonIcon.style.display = 'none';
+    } else {
+      sunIcon.style.display  = 'none';
+      moonIcon.style.display = '';
+    }
   }
   // Rebuild gears for new theme
   if (APP.gears.length) buildGearScene();
@@ -75,10 +77,13 @@ function applyTheme(theme) {
 function initTheme() {
   const saved = localStorage.getItem('kap-theme') || 'dark';
   applyTheme(saved);
-  $('#theme-toggle-btn').addEventListener('click', () => {
-    applyTheme(APP.theme === 'dark' ? 'light' : 'dark');
-    showToast(APP.theme === 'dark' ? 'Dark mode active' : 'Light mode active', '🌓');
-  });
+  const toggleBtn = $('#theme-toggle-btn');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      applyTheme(APP.theme === 'dark' ? 'light' : 'dark');
+      showToast(APP.theme === 'dark' ? 'Dark mode active' : 'Light mode active', '🌓');
+    });
+  }
 }
 
 // ===========================================================================
