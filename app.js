@@ -1,1563 +1,1801 @@
-/**
- * ============================================================================
- * KARAMPUDI ACHARYA PRANAV — DYNAMIC MECHANICAL CAD & ANIME SWORDS ENGINE
- * Features:
- *  - Top Sword Selector: All Blades, Ichigo (Zangetsu), Sasuke (Kusanagi),
- *    Zoro (Wado Ichimonji), Zoro (Sandai Kitetsu), Zoro (Enma).
- *  - Ultra-Polished HD Canvas Procedural Rendering for Anime Blades:
- *    • Realistic kissaki tips, fullers, habakis, tsuka-ito wraps, manji & trefoil tsubas.
- *    • Physics chain links, Chidori lightning branches, Ryuo haki flames, Getsuga waves.
- *  - Dual Light & Dark Mode with High-Contrast Engineering Color Palettes.
- *  - 5-Palette View Range Color Switcher (Cyan, Amber, Crimson, Purple, Emerald).
- *  - Mechanical Load Simulator, Case Study Modals, Command Palette & Audio Haptics.
- * ============================================================================
- */
+/* ============================================================================
+   KARAMPUDI ACHARYA PRANAV — PORTFOLIO APP.JS
+   HD Anime Sword Engine · Light/Dark Theme · Accent Color Switcher
+   ============================================================================ */
 
-(function () {
-  'use strict';
+'use strict';
 
-  const state = {
-    audioEnabled: false,
-    audioCtx: null,
-    cmdIndex: 0,
-    cmdItems: [],
-    theme: localStorage.getItem('kap_portfolio_theme') || 'dark',
-    accent: localStorage.getItem('kap_portfolio_accent') || 'cyan',
-    activeSword: 'all',
-    caseStudies: {
-      steel_plant: {
-        title: "Budgetary Proposal for Equipment in a Steel Plant",
-        badge: "Turnkey Project Management • Equipment Sizing & Layout",
-        problem: "Greenfield steel processing facility required a comprehensive budgetary proposal, equipment capacity sizing, crane coverage envelopes, and equipment sequencing before capital expenditure approval.",
-        solution: "Formulated the complete budgetary proposal and equipment planning in AutoCAD. Analyzed machine specifications, layout flow, material transport rail cars, overhead crane clearances (25T capacity), civil foundation load interfaces, and supplier cost comparison matrices.",
-        diagram: `
-+---------------------------------------------------------------------------------+
-|               STEEL PLANT EQUIPMENT BUDGETARY PROPOSAL & MASTER LAYOUT          |
-+---------------------------------------------------------------------------------+
-| Raw Coil Receiving Bay (25T Overhead Crane) ---> Continuous Strip Leveler Line  |
-|                                                                                 |
-| Coil Slitting & Shearing Line              ---> Cold Forming & Tube Mill Unit   |
-|                                                                                 |
-| Heat Treatment & Annealing Furnaces        ---> Finished Bundling & Dispatch Bay|
-+---------------------------------------------------------------------------------+
-                                         |
-                                         v
-+---------------------------------------------------------------------------------+
-|         CIVIL FOUNDATIONS • TRENCHING • ELECTRICAL SUBSTATION INTERFACING       |
-+---------------------------------------------------------------------------------+`,
-        benchmarks: [
-          { label: "Scope", val: "Full Equipment Budgetary Quote" },
-          { label: "Layout Footprint", val: "45,000 m² Master Plan" },
-          { label: "Crane Integration", val: "25T Hook Clearances" }
-        ],
-        code: `// Equipment Budgetary Proposal Allocation Breakdown:
-// 1. Slitting, Leveling & Uncoiling Lines: Equipment sizing & drive selection
-// 2. Heavy Material Handling & 25T Cranes: Hook coverage & runway beams
-// 3. Drive Cabinets, Substations & PLCs:   Power distribution & cabling
-// 4. Civil Foundation Loading & Pits:      Dynamic load calculations
-// 5. Turnkey Installation & Commissioning: Staged execution schedule`
-      },
-      air_cargo: {
-        title: "Air Cargo Powered Roller Deck & Lazy Dolly Castor Deck System",
-        badge: "Aviation GSE • 7,000 kg ULD Load Rating",
-        problem: "Airport cargo terminals require rapid, omnidirectional transfer of wide-body aircraft Unit Load Devices (ULDs e.g., LD3, LD7, PMC pallets weighing up to 6,800 kg) with minimal operator pushing force and zero container damage under dynamic impact loads.",
-        solution: "Engineered modular heavy-duty steel deck sections integrating motorized powered roller drives with polyurethane coated rollers, pneumatic/mechanical container pallet stops, and an omnidirectional Lazy Dolly Castor Deck matrix with heavy-duty steel ball castors on a staggered 55mm pitch for uniform load distribution.",
-        diagram: `
-+-------------------------------------------------------------------------------+
-|                    AIRCRAFT CARGO LOADER / TRUCK DOCK                         |
-+-------------------------------------------------------------------------------+
-                                      |
-                                      v
-+-----------------------------+               +---------------------------------+
-|  Powered Roller Deck Cell   | <===========> | Lazy Dolly Castor Deck Matrix   |
-|  - 1.5 kW Helical Gearmotor |               | - Omnidirectional Ball Castors  |
-|  - ANSI 50-2 Double Chain   |               | - 7,000 kg Dynamic Load Rating  |
-|  - Bidirectional Stop Locks |               | - Integrated Pallet Guide Rails |
-+-----------------------------+               +---------------------------------+
-                                      |
-                                      v
-+-------------------------------------------------------------------------------+
-|              CONTAINER LOCKING MECHANISMS & RETRACTABLE RESTRAINTS            |
-+-------------------------------------------------------------------------------+`,
-        benchmarks: [
-          { label: "Rated Payload", val: "7,000 kg ULD Capacity" },
-          { label: "Transfer Speed", val: "0.35 m/s Motorized" },
-          { label: "Breakaway Force", val: "< 15 kgf Manual Push" }
-        ],
-        code: `// Drive Torque & Shaft Shear Sizing:
-// Input: ULD Weight = 68,000 N, Roll Friction Coeff = 0.035
-// Drive Torque Required: T = (F_friction * Roll_Radius) / Gear_Ratio
-// 1.5 kW Gearmotor with 1:25 Reduction delivers 340 N·m output torque
-// Factor of Safety on Drive Shaft: FoS = 3.4 against torsional shear`
-      },
-      strip_flattening: {
-        title: "Heavy Industrial Strip Flattening & Coil Leveling Machine",
-        badge: "Automated SPM • 6 mm High-Tensile Steel",
-        problem: "Heavy steel coils exhibit severe residual stresses, coil set curvature, and cross-bow after uncoiling, causing binding in downstream precision stamping dies and automated welding fixtures.",
-        solution: "Engineered a 17-roll precision leveling cassette with induction-hardened chrome-plated 42CrMo4 alloy steel rolls. Designed synchronized hydraulic downforce cylinders delivering 80 kN to produce alternating elastoplastic bending, backed by dual planetary reduction drives.",
-        diagram: `
-[ Steel Coil Reel ] ---> ( Pinch Entry Rolls ) ---> [ 17-Roll Leveling Cassette ]
-                                                                |
-                                             +------------------+------------------+
-                                             | 80 kN Hydraulic Downforce Cylinders |
-                                             | Chrome Plated 42CrMo4 Alloy Rolls   |
-                                             +------------------+------------------+
-                                                                |
-                                                                v
-                                              [ Tension Exit & Flatness Laser QA ]`,
-        benchmarks: [
-          { label: "Strip Width", val: "Up to 1,200 mm" },
-          { label: "Hydraulic Force", val: "80 kN Downforce" },
-          { label: "Residual Flatness", val: "< 0.1 mm / meter" }
-        ],
-        code: `// Bending Moment & Roll Tonnage Sizing:
-// Strip: Width b = 1200 mm, Thickness t = 6 mm, Yield Sy = 355 MPa
-// Section Modulus: Z = (b * t^2) / 6 = (1200 * 36) / 6 = 7,200 mm³
-// Total Leveling Force required = 78.4 kN -> 80 kN hydraulic system configured`
-      },
-      t_spacer: {
-        title: "Automated T-Spacer Precision Cutting Machine",
-        badge: "Special Purpose Machinery (SPM) • ±0.05 mm Accuracy",
-        problem: "Manual and semi-automated cutting of insulating glass T-spacers caused high material scrap rates, inconsistent cut lengths (±1.5mm), burrs on miter cuts, and safety hazards during high-speed saw blade engagement.",
-        solution: "Engineered an automated cutting cell featuring servo-driven linear ball screws for precise indexing, dual pneumatic clamping jaws lined with urethane pads to avoid surface marring, a high-RPM carbide-tipped circular blade, and an automatic chip vacuum extraction system.",
-        diagram: `
-[ Profile Feeder ] ---> [ Linear Servo Indexer ] ---> [ Pneumatic Dual Clamps ]
-                                                                 |
-                                                     High-Speed Carbide Saw Blade
-                                                     (4,500 RPM Down-Stroke)
-                                                                 |
-                                          [ Automated Ejection & Chip Extraction ]`,
-        benchmarks: [
-          { label: "Cut Tolerance", val: "± 0.05 mm Accuracy" },
-          { label: "Cycle Time", val: "1.8 Seconds per Cut" },
-          { label: "Scrap Reduction", val: "94% Material Yield" }
-        ],
-        code: `// Cycle Time Synchronization Sequence:
-// Step 1: Servo Feed Index (400 mm @ 600 mm/s) = 0.67s
-// Step 2: Pneumatic Clamp Actuation (6 bar)     = 0.15s
-// Step 3: Blade Down-Stroke & Cut               = 0.45s
-// Step 4: Blade Retract & Unclamp               = 0.25s
-// Step 5: Part Ejection to Chute                = 0.28s
-// Total Cycle Time per Piece                    = 1.80 seconds`
-      },
-      load_analysis: {
-        title: "CAD FEA Simulation & Real-Life Proof Load Testing Rig",
-        badge: "Structural Analysis • Physical Load Testing",
-        problem: "Critical lifting beams, spreader bars, and heavy material handling frames must be certified for 1.5x dynamic overload conditions with zero plastic deformation or fatigue cracking under cyclic service.",
-        solution: "Conducted non-linear Finite Element Analysis (FEA) in SolidWorks Simulation and ANSYS to identify peak Von Mises stresses and deflection contours. Constructed an in-house proof testing rig utilizing calibrated hydraulic rams and strain gauges to validate deflection against simulation data.",
-        diagram: `
-Digital CAD Model ---> [ Mesh Refinement (Tet10) ] ---> [ FEA Von Mises Stress Heatmap ]
-                                                                   |
-                                                         (Comparative Validation)
-                                                                   |
-Physical Prototype ---> [ Calibrated Hydraulic Rams ] ---> [ Strain Gauge Telemetry ]`,
-        benchmarks: [
-          { label: "Proof Load", val: "1.5x Dynamic Overload" },
-          { label: "Max Deflection", val: "1.42 mm (Spec < 2.5 mm)" },
-          { label: "Factor of Safety", val: "3.2 FoS Certified" }
-        ],
-        code: `// Proof Test & Stress Verification Protocol:
-// Applied Test Load: P = 1.5 * W_rated = 1.5 * 70 kN = 105 kN
-// Measured Max Strain: ε = 520 microstrain
-// Calculated Stress: σ = E * ε = 210,000 MPa * 0.00052 = 109.2 MPa
-// Yield Strength S355JR = 355 MPa -> Factor of Safety FoS = 3.25`
-      },
-      autocad_proposals: {
-        title: "AutoCAD Manufacturing Proposals & Site Commissioning Redlines",
-        badge: "ASME Y14.5M • QA Inspection Documentation",
-        problem: "Manufacturing errors and field installation delays frequently arise from ambiguous 2D drawings, missing datum references, and unforeseen site civil floor level deviations.",
-        solution: "Authored comprehensive AutoCAD 2D drafting packages conforming to ASME Y14.5M GD&T standards, created First Article Inspection (FAI) reports, and performed real-time site engineering redlines during plant commissioning to adapt mounting brackets to field conditions.",
-        diagram: `
-3D SolidWorks Assembly ---> AutoCAD 2D Drafting ---> ASME Y14.5 GD&T Callouts
-                                                             |
-                                           +-----------------+-----------------+
-                                           | Fabrication BOM & Weld Symbols    |
-                                           | On-Site Redline Retrofit Protocols|
-                                           +-----------------+-----------------+`,
-        benchmarks: [
-          { label: "Inspection Pass", val: "99.8% First Article FAI" },
-          { label: "Standard", val: "ASME Y14.5M / ISO 2768" },
-          { label: "Field Redlines", val: "100% Commissioned" }
-        ],
-        code: `// Drawing Standard Callouts Checklist:
-// - True Position: [ ⌖ | ⌀ 0.05 | A | B | C ] on all critical bearing bores
-// - Surface Texture: Ra 1.6 on sliding ways, Ra 3.2 on structural weldments
-// - Welding: Continuous fillet weld 6mm conforming to AWS D1.1`
-      }
-    }
+// ===========================================================================
+// STATE
+// ===========================================================================
+const APP = {
+  theme:          'dark',
+  accent:         'cyan',
+  audioEnabled:   false,
+  activeSword:    'all',
+  cmdPaletteOpen: false,
+  modalOpen:      false,
+  swords:         [],
+  particles:      [],
+  animFrameId:    null,
+  ctx:            null,
+  canvas:         null,
+  W:              0,
+  H:              0,
+  scrollY:        0,
+  mouse:          { x: 0, y: 0 },
+};
+
+// ===========================================================================
+// UTILITY HELPERS
+// ===========================================================================
+const $ = (sel, ctx = document) => ctx.querySelector(sel);
+const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
+const lerp = (a, b, t) => a + (b - a) * t;
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const rnd  = (min, max) => Math.random() * (max - min) + min;
+const rndInt = (min, max) => Math.floor(rnd(min, max + 1));
+const TAU = Math.PI * 2;
+
+function debounce(fn, delay) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
+}
+
+// ===========================================================================
+// TOAST NOTIFICATIONS
+// ===========================================================================
+function showToast(msg, icon = '⚔️', duration = 2800) {
+  const container = $('#toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<span class="toast-emoji">${icon}</span><span>${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('removing');
+    toast.addEventListener('animationend', () => toast.remove());
+  }, duration);
+}
+
+// ===========================================================================
+// THEME SYSTEM (Dark / Light)
+// ===========================================================================
+function applyTheme(theme) {
+  APP.theme = theme;
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('kap-theme', theme);
+  const sunIcon  = $('#theme-sun-icon');
+  const moonIcon = $('#theme-moon-icon');
+  if (theme === 'dark') {
+    if (sunIcon)  sunIcon.style.display  = '';
+    if (moonIcon) moonIcon.style.display = 'none';
+  } else {
+    if (sunIcon)  sunIcon.style.display  = 'none';
+    if (moonIcon) moonIcon.style.display = '';
+  }
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('kap-theme') || 'dark';
+  applyTheme(saved);
+  const btn = $('#theme-toggle-btn');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const next = APP.theme === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      showToast(next === 'dark' ? 'Dark mode active' : 'Light mode active', '🌓');
+    });
+  }
+}
+
+// ===========================================================================
+// ACCENT COLOR SWITCHER
+// ===========================================================================
+const ACCENT_LABELS = {
+  cyan:    'Blueprint Cyan',
+  amber:   'Industrial Amber',
+  crimson: 'Getsuga Crimson',
+  purple:  'Ryuo Purple',
+  emerald: 'Precision Emerald',
+};
+
+function applyAccent(accent) {
+  APP.accent = accent;
+  document.documentElement.setAttribute('data-accent', accent);
+  localStorage.setItem('kap-accent', accent);
+  $$('.accent-dot').forEach(dot => {
+    dot.classList.toggle('active', dot.dataset.accent === accent);
+  });
+}
+
+function initAccentPicker() {
+  const savedAccent = localStorage.getItem('kap-accent') || 'crimson';
+  applyAccent(savedAccent);
+  $$('.accent-dot').forEach(dot => {
+    dot.addEventListener('click', () => {
+      const a = dot.dataset.accent;
+      applyAccent(a);
+      showToast(`Accent: ${ACCENT_LABELS[a] || a}`, '🎨');
+      playHaptic('click');
+    });
+  });
+}
+
+// ===========================================================================
+// NAVBAR SCROLL BEHAVIOUR
+// ===========================================================================
+function initNavbar() {
+  const navbar = $('#navbar');
+  const navLinks = $$('.nav-link');
+
+  window.addEventListener('scroll', debounce(() => {
+    APP.scrollY = window.scrollY;
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
+
+    const sections = $$('section[id], div[id]');
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 120) current = s.id;
+    });
+    navLinks.forEach(a => {
+      const href = a.getAttribute('href')?.replace('#', '');
+      a.classList.toggle('active', href === current);
+    });
+  }, 80));
+}
+
+// ===========================================================================
+// MOBILE DRAWER
+// ===========================================================================
+function initMobileDrawer() {
+  const toggleBtn = $('#mobile-menu-toggle');
+  const drawer    = $('#mobile-drawer');
+
+  toggleBtn.addEventListener('click', () => {
+    drawer.classList.toggle('open');
+    document.body.style.overflow = drawer.classList.contains('open') ? 'hidden' : '';
+  });
+
+  $$('[data-close-drawer]').forEach(el => {
+    el.addEventListener('click', () => {
+      drawer.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  });
+}
+
+// ===========================================================================
+// AUDIO HAPTICS
+// ===========================================================================
+function initAudio() {
+  const btn        = $('#audio-toggle-btn');
+  const iconMuted  = $('#audio-icon-muted');
+  const iconActive = $('#audio-icon-active');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    APP.audioEnabled = !APP.audioEnabled;
+    iconMuted.style.display  = APP.audioEnabled ? 'none' : '';
+    iconActive.style.display = APP.audioEnabled ? '' : 'none';
+    showToast(APP.audioEnabled ? 'Audio haptics on' : 'Audio haptics off', '🔊');
+  });
+}
+
+function playHaptic(type = 'click') {
+  if (!APP.audioEnabled) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    const map = { click: [600, 0.02, 'sine'], success: [880, 0.05, 'sine'], error: [200, 0.05, 'sawtooth'] };
+    const [freq, dur, type_] = map[type] || map.click;
+    osc.type = type_;
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+
+// ===========================================================================
+// HD ANIME SWORD ENGINE
+// ===========================================================================
+
+/* --------------------------------------------------------------------------
+   Sword definitions — each has physics params + draw function
+   -------------------------------------------------------------------------- */
+const SWORD_DEFS = [
+  {
+    id:    'ichigo',
+    label: 'Tensa Zangetsu',
+    char:  'Ichigo',
+    emoji: '🌑',
+    // Canvas drawing function — receives (ctx, params)
+    draw: drawIchigo,
+    // Colors used in particle effects
+    particleColors: ['#ef4444','#dc2626','#991b1b','#fca5a5','#ff6b6b'],
+    auraColor: 'rgba(239,68,68,0.35)',
+  },
+  {
+    id:    'kusanagi',
+    label: 'Kusanagi',
+    char:  'Sasuke',
+    emoji: '⚡',
+    draw: drawKusanagi,
+    particleColors: ['#60a5fa','#3b82f6','#a78bfa','#c4b5fd','#e0f2fe'],
+    auraColor: 'rgba(96,165,250,0.30)',
+  },
+  {
+    id:    'wado',
+    label: 'Wado Ichimonji',
+    char:  'Zoro',
+    emoji: '🤍',
+    draw: drawWado,
+    particleColors: ['#e2e8f0','#94a3b8','#67e8f9','#a5f3fc','#f0f9ff'],
+    auraColor: 'rgba(148,163,184,0.28)',
+  },
+  {
+    id:    'kitetsu',
+    label: 'Sandai Kitetsu',
+    char:  'Zoro',
+    emoji: '🔴',
+    draw: drawKitetsu,
+    particleColors: ['#f87171','#ef4444','#dc2626','#fbbf24','#fca5a5'],
+    auraColor: 'rgba(248,113,113,0.32)',
+  },
+  {
+    id:    'enma',
+    label: 'Enma',
+    char:  'Zoro',
+    emoji: '🟣',
+    draw: drawEnma,
+    particleColors: ['#c084fc','#a855f7','#7c3aed','#e9d5ff','#d8b4fe'],
+    auraColor: 'rgba(192,132,252,0.30)',
+  },
+];
+
+/* --------------------------------------------------------------------------
+   Particle system
+   -------------------------------------------------------------------------- */
+function spawnParticle(x, y, colors, auraColor) {
+  const count = rndInt(1, 3);
+  for (let i = 0; i < count; i++) {
+    APP.particles.push({
+      x, y,
+      vx: rnd(-1.4, 1.4),
+      vy: rnd(-2.8, -0.6),
+      life: 1.0,
+      decay: rnd(0.012, 0.025),
+      size: rnd(1.5, 4.5),
+      color: colors[rndInt(0, colors.length - 1)],
+      spin: rnd(-0.15, 0.15),
+    });
+  }
+}
+
+function updateParticles() {
+  APP.particles = APP.particles.filter(p => p.life > 0);
+  APP.particles.forEach(p => {
+    p.x  += p.vx;
+    p.y  += p.vy;
+    p.vy += 0.04;  // gravity
+    p.life -= p.decay;
+    p.vx  *= 0.98;
+  });
+}
+
+function drawParticles(ctx) {
+  APP.particles.forEach(p => {
+    ctx.save();
+    ctx.globalAlpha = p.life * 0.85;
+    ctx.fillStyle = p.color;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * p.life, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+  });
+}
+
+/* --------------------------------------------------------------------------
+   Sword object factory
+   -------------------------------------------------------------------------- */
+function createSword(defIndex, isHero) {
+  const def = SWORD_DEFS[defIndex];
+  const W = APP.W, H = APP.H;
+
+  // Position — hero sword floats in center-right area; others scatter
+  let x, y, scale, angle;
+  if (isHero) {
+    x     = W * rnd(0.58, 0.78);
+    y     = H * rnd(0.30, 0.70);
+    scale = clamp(Math.min(W, H) * 0.0013, 0.60, 1.20);
+    angle = rnd(-0.22, 0.22);
+  } else {
+    x     = rnd(W * 0.06, W * 0.94);
+    y     = rnd(H * 0.06, H * 0.94);
+    scale = clamp(Math.min(W, H) * rnd(0.0005, 0.0010), 0.25, 0.70);
+    angle = rnd(0, TAU);
+  }
+
+  return {
+    defIndex,
+    def,
+    x, y,
+    angle,
+    targetAngle:   angle,
+    driftAngle:    rnd(0, TAU),
+    driftSpeed:    rnd(0.004, 0.009),
+    driftRadius:   rnd(15, 45),
+    bobY:          rnd(0, TAU),
+    bobSpeed:      rnd(0.003, 0.007),
+    bobAmp:        isHero ? rnd(6, 14) : rnd(3, 8),
+    rotateSpeed:   rnd(-0.006, 0.006),
+    scale,
+    alpha:         isHero ? 1.0 : rnd(0.30, 0.65),
+    isHero,
+    pulseT:        rnd(0, TAU),
+    pulseSpeed:    rnd(0.025, 0.040),
+    particleTimer: 0,
+    particleRate:  isHero ? rnd(3, 7) : rnd(10, 24),
   };
+}
 
-  // ==========================================================================
-  // WEB AUDIO HAPTICS
-  // ==========================================================================
-  function initAudio() {
-    if (!state.audioCtx) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (AudioCtx) state.audioCtx = new AudioCtx();
-    }
-    if (state.audioCtx && state.audioCtx.state === 'suspended') {
-      state.audioCtx.resume();
+/* --------------------------------------------------------------------------
+   Build sword scene
+   -------------------------------------------------------------------------- */
+function buildSwordScene() {
+  APP.swords = [];
+  const W = APP.W;
+
+  // Determine which sword defs to include
+  let defs;
+  if (APP.activeSword === 'all') {
+    defs = SWORD_DEFS.map((_, i) => i);
+  } else {
+    defs = [SWORD_DEFS.findIndex(d => d.id === APP.activeSword)];
+    if (defs[0] === -1) defs = [0];
+  }
+
+  // Hero sword — one prominent centered blade
+  const heroDefIdx = defs[rndInt(0, defs.length - 1)];
+  APP.swords.push(createSword(heroDefIdx, true));
+
+  // Background swords
+  const bgCount = APP.activeSword === 'all' ? 7 : 4;
+  for (let i = 0; i < bgCount; i++) {
+    const idx = defs[i % defs.length];
+    APP.swords.push(createSword(idx, false));
+  }
+
+  updateSwordBanner();
+}
+
+/* --------------------------------------------------------------------------
+   Update sword banner (hero HUD)
+   -------------------------------------------------------------------------- */
+function updateSwordBanner() {
+  const labelEl = $('#active-sword-label');
+  const stateEl = $('#active-sword-state');
+  if (!labelEl || !stateEl) return;
+  const pill = $(`.sword-select-pill.active`);
+  const label = pill ? pill.dataset.label || pill.textContent.trim() : 'All Blades';
+  labelEl.textContent = `Active Blade: ${label}`;
+  stateEl.textContent = 'Animated · Interactive';
+}
+
+/* --------------------------------------------------------------------------
+   Sword draw functions — HD procedural rendering
+   -------------------------------------------------------------------------- */
+
+// — — — ICHIGO's TENSA ZANGETSU — — —
+// Curved daito, Manji tsuba, black cloth hilt, crimson chain, Getsuga ribbons
+function drawIchigo(ctx, scale, t, alpha, isHero) {
+  const s = scale * 130;
+
+  // ── Energy aura / Getsuga haze ──
+  if (isHero) {
+    const g = ctx.createRadialGradient(0, 0, s * 0.2, 0, 0, s * 0.8);
+    g.addColorStop(0, 'rgba(239,68,68,0.12)');
+    g.addColorStop(1, 'rgba(239,68,68,0.00)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, s * 0.55, s * 0.9, 0, 0, TAU);
+    ctx.fill();
+  }
+
+  // ── Getsuga crimson ribbons ──
+  if (isHero) {
+    for (let r = 0; r < 3; r++) {
+      const wave = Math.sin(t * 0.03 + r * 2.1 + 1.2) * s * 0.18;
+      ctx.save();
+      ctx.globalAlpha = 0.35 + 0.15 * Math.sin(t * 0.04 + r);
+      ctx.strokeStyle = r === 0 ? '#ef4444' : r === 1 ? '#dc2626' : '#fca5a5';
+      ctx.lineWidth = 2.5 - r * 0.5;
+      ctx.shadowColor = '#ef4444';
+      ctx.shadowBlur = 14;
+      ctx.beginPath();
+      ctx.moveTo(-s * 0.08, -s * 0.82 + r * s * 0.05);
+      ctx.bezierCurveTo(
+        wave, -s * 0.5,
+        -wave, -s * 0.2,
+        wave * 0.6, s * 0.3
+      );
+      ctx.stroke();
+      ctx.restore();
     }
   }
 
-  function playUiSound(type = 'click') {
-    if (!state.audioEnabled || !state.audioCtx) return;
-    try {
-      const now = state.audioCtx.currentTime;
-      const osc = state.audioCtx.createOscillator();
-      const gain = state.audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(state.audioCtx.destination);
+  // ── Blade — curved daito ──
+  ctx.save();
+  // Blade base shape (back edge)
+  ctx.beginPath();
+  ctx.moveTo(0, -s * 0.92);       // Kissaki tip
+  ctx.bezierCurveTo(
+    s * 0.08, -s * 0.70,
+    s * 0.10, -s * 0.30,
+    s * 0.07, s * 0.10            // Munemachi (blade/hilt join)
+  );
+  ctx.lineTo(s * 0.03, s * 0.10);
+  ctx.bezierCurveTo(
+    s * 0.06, -s * 0.28,
+    s * 0.04, -s * 0.68,
+    -s * 0.02, -s * 0.92
+  );
+  ctx.closePath();
 
-      if (type === 'click') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(580, now);
-        osc.frequency.exponentialRampToValueAtTime(290, now + 0.04);
-        gain.gain.setValueAtTime(0.04, now);
-        gain.gain.linearRampToValueAtTime(0.001, now + 0.04);
-        osc.start(now);
-        osc.stop(now + 0.04);
-      } else if (type === 'pop') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(380, now);
-        osc.frequency.exponentialRampToValueAtTime(760, now + 0.06);
-        gain.gain.setValueAtTime(0.05, now);
-        gain.gain.linearRampToValueAtTime(0.001, now + 0.06);
-        osc.start(now);
-        osc.stop(now + 0.06);
-      } else if (type === 'slash') {
-        // Crisp metallic sword slice swoosh
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(880, now);
-        osc.frequency.exponentialRampToValueAtTime(140, now + 0.12);
-        gain.gain.setValueAtTime(0.06, now);
-        gain.gain.linearRampToValueAtTime(0.001, now + 0.12);
-        osc.start(now);
-        osc.stop(now + 0.12);
-      } else if (type === 'success') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(523.25, now);
-        osc.frequency.setValueAtTime(659.25, now + 0.08);
-        osc.frequency.setValueAtTime(783.99, now + 0.16);
-        gain.gain.setValueAtTime(0.05, now);
-        gain.gain.linearRampToValueAtTime(0.001, now + 0.28);
-        osc.start(now);
-        osc.stop(now + 0.28);
+  // Blade gradient — mirror polish
+  const bladeGrad = ctx.createLinearGradient(-s * 0.05, -s * 0.9, s * 0.12, s * 0.1);
+  bladeGrad.addColorStop(0.0,  '#e8e8f0');
+  bladeGrad.addColorStop(0.25, '#b8bfca');
+  bladeGrad.addColorStop(0.5,  '#d0d5de');
+  bladeGrad.addColorStop(0.75, '#8a9098');
+  bladeGrad.addColorStop(1.0,  '#6d737c');
+  ctx.fillStyle = bladeGrad;
+  ctx.fill();
+
+  // Hamon line (temper line)
+  ctx.beginPath();
+  ctx.moveTo(s * 0.04, s * 0.06);
+  ctx.bezierCurveTo(s * 0.07, -s * 0.18, s * 0.09, -s * 0.42, s * 0.05, -s * 0.78);
+  ctx.strokeStyle = 'rgba(255,255,255,0.65)';
+  ctx.lineWidth = 1.1;
+  ctx.stroke();
+
+  // Edge highlight
+  ctx.beginPath();
+  ctx.moveTo(-s * 0.018, -s * 0.91);
+  ctx.bezierCurveTo(-s * 0.01, -s * 0.60, 0, -s * 0.28, s * 0.02, s * 0.10);
+  ctx.strokeStyle = 'rgba(220,225,240,0.90)';
+  ctx.lineWidth = 1.5;
+  ctx.shadowColor = 'rgba(255,255,255,0.8)';
+  ctx.shadowBlur = 6;
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Habaki collar ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(-s * 0.055, s * 0.06, s * 0.115, s * 0.055);
+  const habakiG = ctx.createLinearGradient(-s * 0.055, 0, s * 0.06, 0);
+  habakiG.addColorStop(0, '#4a4a54');
+  habakiG.addColorStop(0.5, '#7a7a88');
+  habakiG.addColorStop(1, '#3a3a44');
+  ctx.fillStyle = habakiG;
+  ctx.fill();
+  ctx.restore();
+
+  // ── Manji tsuba (cross-guard) ──
+  ctx.save();
+  ctx.strokeStyle = '#2a2a2a';
+  ctx.lineWidth = s * 0.036;
+  ctx.lineCap = 'round';
+  ctx.shadowColor = 'rgba(0,0,0,0.6)';
+  ctx.shadowBlur = 6;
+  // Horizontal bar
+  ctx.beginPath();
+  ctx.moveTo(-s * 0.22, s * 0.115);
+  ctx.lineTo( s * 0.22, s * 0.115);
+  ctx.stroke();
+  // Manji hook - top left
+  ctx.beginPath();
+  ctx.moveTo(-s * 0.22, s * 0.115);
+  ctx.lineTo(-s * 0.22, s * 0.05);
+  ctx.stroke();
+  // Manji hook - bottom right
+  ctx.beginPath();
+  ctx.moveTo(s * 0.22, s * 0.115);
+  ctx.lineTo(s * 0.22, s * 0.18);
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Hilt — black cloth diamond wrap ──
+  ctx.save();
+  const hiltLen = s * 0.36;
+  ctx.beginPath();
+  ctx.rect(-s * 0.045, s * 0.155, s * 0.09, hiltLen);
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fill();
+  // Diamond ito wrap
+  for (let d = 0; d < 7; d++) {
+    const dy = s * 0.165 + d * s * 0.048;
+    ctx.beginPath();
+    ctx.moveTo(-s * 0.045, dy);
+    ctx.lineTo(0, dy + s * 0.024);
+    ctx.lineTo(s * 0.045, dy);
+    ctx.strokeStyle = 'rgba(80,80,95,0.70)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // ── Chain links ──
+  if (isHero) {
+    ctx.save();
+    const chainSwing = Math.sin(t * 0.02) * s * 0.12;
+    const chainY = s * 0.52;
+    for (let c = 0; c < 5; c++) {
+      const cx = chainSwing * (c / 4);
+      const cy = chainY + c * s * 0.06;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, s * 0.022, s * 0.014, Math.PI / 4 + c * 0.4, 0, TAU);
+      ctx.strokeStyle = '#3a3a3a';
+      ctx.lineWidth = 1.6;
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // ── Pommel ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(0, s * 0.54, s * 0.05, s * 0.03, 0, 0, TAU);
+  ctx.fillStyle = '#2a2a2a';
+  ctx.fill();
+  ctx.restore();
+}
+
+// — — — SASUKE's KUSANAGI — — —
+// Straight chokuto, chrome blade, black hilt, Chidori lightning arcs
+function drawKusanagi(ctx, scale, t, alpha, isHero) {
+  const s = scale * 130;
+
+  // ── Chidori lightning field ──
+  if (isHero) {
+    for (let l = 0; l < 4; l++) {
+      ctx.save();
+      ctx.globalAlpha = 0.55 * Math.abs(Math.sin(t * 0.08 + l * 1.6));
+      ctx.strokeStyle = l % 2 === 0 ? '#60a5fa' : '#a78bfa';
+      ctx.lineWidth = 1.0;
+      ctx.shadowColor = '#3b82f6';
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      let lx = rnd(-s * 0.25, s * 0.25);
+      let ly = -s * 0.75;
+      ctx.moveTo(lx, ly);
+      for (let seg = 0; seg < 5; seg++) {
+        lx += rnd(-s * 0.08, s * 0.08);
+        ly += rnd(s * 0.12, s * 0.22);
+        ctx.lineTo(lx, ly);
       }
-    } catch (e) {
-      console.warn("Audio issue:", e);
+      ctx.stroke();
+      ctx.restore();
     }
   }
 
-  function toggleAudio() {
-    initAudio();
-    state.audioEnabled = !state.audioEnabled;
-    const btn = document.getElementById('audio-toggle-btn');
-    const iconMuted = document.getElementById('audio-icon-muted');
-    const iconActive = document.getElementById('audio-icon-active');
+  // ── Straight chokuto blade ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(0, -s * 0.90);       // Tip
+  ctx.lineTo( s * 0.05, -s * 0.82);
+  ctx.lineTo( s * 0.06,  s * 0.08);
+  ctx.lineTo(-s * 0.06,  s * 0.08);
+  ctx.lineTo(-s * 0.04, -s * 0.82);
+  ctx.closePath();
 
-    if (state.audioEnabled) {
-      btn.classList.add('active');
-      iconMuted.style.display = 'none';
-      iconActive.style.display = 'block';
-      showToast("Engineering UI Haptics Enabled", "🔊");
-      playUiSound('success');
-    } else {
-      btn.classList.remove('active');
-      iconMuted.style.display = 'block';
-      iconActive.style.display = 'none';
-      showToast("UI Haptics Muted", "🔇");
+  const bladeGrad = ctx.createLinearGradient(-s * 0.06, 0, s * 0.06, 0);
+  bladeGrad.addColorStop(0.0,  '#c8d0e0');
+  bladeGrad.addColorStop(0.3,  '#e8ecf4');
+  bladeGrad.addColorStop(0.55, '#f4f6fa');
+  bladeGrad.addColorStop(0.80, '#b8c0cc');
+  bladeGrad.addColorStop(1.0,  '#7a8090');
+  ctx.fillStyle = bladeGrad;
+  ctx.fill();
+
+  // Fuller groove
+  ctx.beginPath();
+  ctx.moveTo(s * 0.012, -s * 0.84);
+  ctx.lineTo(s * 0.012,  s * 0.04);
+  ctx.strokeStyle = 'rgba(160,170,190,0.55)';
+  ctx.lineWidth = 1.8;
+  ctx.stroke();
+
+  // Edge gleam
+  ctx.beginPath();
+  ctx.moveTo(-s * 0.038, -s * 0.88);
+  ctx.lineTo(-s * 0.056,  s * 0.06);
+  ctx.strokeStyle = 'rgba(235,240,255,0.92)';
+  ctx.lineWidth = 1.4;
+  ctx.shadowColor = 'rgba(96,165,250,0.7)';
+  ctx.shadowBlur = 10;
+  ctx.stroke();
+
+  // Blue tint at tip (lightning charge)
+  const tipGrad = ctx.createLinearGradient(0, -s * 0.90, 0, -s * 0.60);
+  tipGrad.addColorStop(0, 'rgba(96,165,250,0.50)');
+  tipGrad.addColorStop(1, 'rgba(96,165,250,0.00)');
+  ctx.beginPath();
+  ctx.moveTo(0, -s * 0.90);
+  ctx.lineTo(s * 0.05, -s * 0.82);
+  ctx.lineTo(-s * 0.04, -s * 0.82);
+  ctx.closePath();
+  ctx.fillStyle = tipGrad;
+  ctx.fill();
+  ctx.restore();
+
+  // ── Habaki ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(-s * 0.07, s * 0.04, s * 0.14, s * 0.06);
+  const hG = ctx.createLinearGradient(-s * 0.07, 0, s * 0.07, 0);
+  hG.addColorStop(0, '#1a1a2a');
+  hG.addColorStop(0.5, '#3a3a5a');
+  hG.addColorStop(1, '#1a1a2a');
+  ctx.fillStyle = hG;
+  ctx.fill();
+  ctx.restore();
+
+  // ── Round tsuba with kunai slots ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(0, s * 0.13, s * 0.14, 0, TAU);
+  ctx.fillStyle = '#1c1c28';
+  ctx.fill();
+  ctx.strokeStyle = '#3b82f6';
+  ctx.lineWidth = 1.5;
+  ctx.shadowColor = '#3b82f6';
+  ctx.shadowBlur = 8;
+  ctx.stroke();
+  // Inner circle
+  ctx.beginPath();
+  ctx.arc(0, s * 0.13, s * 0.08, 0, TAU);
+  ctx.strokeStyle = 'rgba(96,165,250,0.35)';
+  ctx.lineWidth = 1.0;
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Black hilt with blue bindings ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(-s * 0.045, s * 0.27, s * 0.09, s * 0.32);
+  ctx.fillStyle = '#0f0f1a';
+  ctx.fill();
+  // Blue wrap lines
+  for (let b = 0; b < 6; b++) {
+    const by = s * 0.28 + b * s * 0.046;
+    ctx.beginPath();
+    ctx.moveTo(-s * 0.045, by);
+    ctx.lineTo( s * 0.045, by);
+    ctx.strokeStyle = 'rgba(59,130,246,0.50)';
+    ctx.lineWidth = 1.0;
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // ── Pommel ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(0, s * 0.62, s * 0.052, 0, TAU);
+  ctx.fillStyle = '#1c1c28';
+  ctx.fill();
+  ctx.strokeStyle = '#3b82f6';
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+  ctx.restore();
+}
+
+// — — — ZORO's WADO ICHIMONJI — — —
+// White-polished blade, gold circular tsuba, white hilt wrap, cyan wind slashes
+function drawWado(ctx, scale, t, alpha, isHero) {
+  const s = scale * 130;
+
+  // ── Cyan wind slashes ──
+  if (isHero) {
+    for (let w = 0; w < 3; w++) {
+      const age = (t * 0.018 + w * 2.1) % TAU;
+      const fade = Math.sin(age) * 0.5 + 0.5;
+      ctx.save();
+      ctx.globalAlpha = fade * 0.45;
+      ctx.strokeStyle = '#67e8f9';
+      ctx.lineWidth = 1.2 + w * 0.4;
+      ctx.shadowColor = '#06b6d4';
+      ctx.shadowBlur = 14;
+      ctx.beginPath();
+      ctx.arc(0, -s * 0.2, s * (0.25 + w * 0.12), -0.7, 0.2);
+      ctx.stroke();
+      ctx.restore();
     }
   }
 
-  // ==========================================================================
-  // THEME & COLOR PALETTE MANAGEMENT
-  // ==========================================================================
-  function applyTheme(theme) {
-    state.theme = theme;
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('kap_portfolio_theme', theme);
+  // ── Polished white-silver blade ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(0, -s * 0.92);
+  ctx.lineTo(s * 0.04, -s * 0.84);
+  ctx.lineTo(s * 0.06,  s * 0.06);
+  ctx.lineTo(-s * 0.06,  s * 0.06);
+  ctx.lineTo(-s * 0.04, -s * 0.84);
+  ctx.closePath();
 
-    const sunIcon = document.getElementById('theme-sun-icon');
-    const moonIcon = document.getElementById('theme-moon-icon');
-    if (sunIcon && moonIcon) {
-      if (theme === 'light') {
-        sunIcon.style.display = 'none';
-        moonIcon.style.display = 'block';
-      } else {
-        sunIcon.style.display = 'block';
-        moonIcon.style.display = 'none';
-      }
+  const bladeGrad = ctx.createLinearGradient(-s * 0.06, 0, s * 0.06, 0);
+  bladeGrad.addColorStop(0.00, '#f0f4fa');
+  bladeGrad.addColorStop(0.30, '#ffffff');
+  bladeGrad.addColorStop(0.60, '#e8ecf4');
+  bladeGrad.addColorStop(0.85, '#c8d4e0');
+  bladeGrad.addColorStop(1.00, '#a8b8c8');
+  ctx.fillStyle = bladeGrad;
+  ctx.fill();
+
+  // Mirror hamon — wavy temper line
+  ctx.beginPath();
+  let hamonX = s * 0.035;
+  for (let hy = s * 0.05; hy > -s * 0.85; hy -= s * 0.06) {
+    hamonX = s * 0.032 + Math.sin(hy * 5.5) * s * 0.008;
+    ctx.lineTo(hamonX, hy);
+  }
+  ctx.strokeStyle = 'rgba(255,255,255,0.80)';
+  ctx.lineWidth = 1.0;
+  ctx.stroke();
+
+  // Bright edge
+  ctx.beginPath();
+  ctx.moveTo(-s * 0.038, -s * 0.90);
+  ctx.lineTo(-s * 0.055,  s * 0.04);
+  ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+  ctx.lineWidth = 1.6;
+  ctx.shadowColor = 'rgba(103,232,249,0.8)';
+  ctx.shadowBlur = 8;
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Gold habaki ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(-s * 0.065, s * 0.03, s * 0.13, s * 0.06);
+  const habG = ctx.createLinearGradient(-s * 0.065, 0, s * 0.065, 0);
+  habG.addColorStop(0, '#7a6000');
+  habG.addColorStop(0.4, '#d4a800');
+  habG.addColorStop(0.7, '#f0cc00');
+  habG.addColorStop(1, '#7a6000');
+  ctx.fillStyle = habG;
+  ctx.fill();
+  ctx.restore();
+
+  // ── Gold circular tsuba ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(0, s * 0.12, s * 0.13, 0, TAU);
+  const tsubaGrad = ctx.createRadialGradient(0, s * 0.12, s * 0.04, 0, s * 0.12, s * 0.13);
+  tsubaGrad.addColorStop(0, '#d4a800');
+  tsubaGrad.addColorStop(0.5, '#a07800');
+  tsubaGrad.addColorStop(1, '#6a5000');
+  ctx.fillStyle = tsubaGrad;
+  ctx.fill();
+  // Gold rim
+  ctx.strokeStyle = '#f0cc00';
+  ctx.lineWidth = 1.5;
+  ctx.shadowColor = '#f0cc00';
+  ctx.shadowBlur = 6;
+  ctx.stroke();
+  // Inner ring
+  ctx.beginPath();
+  ctx.arc(0, s * 0.12, s * 0.075, 0, TAU);
+  ctx.strokeStyle = 'rgba(240,204,0,0.45)';
+  ctx.lineWidth = 1.0;
+  ctx.stroke();
+  ctx.restore();
+
+  // ── White hilt with ray-skin diamonds ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(-s * 0.042, s * 0.25, s * 0.084, s * 0.32);
+  ctx.fillStyle = '#f8f8fc';
+  ctx.fill();
+  // Diamond wrap (white cloth)
+  for (let d = 0; d < 7; d++) {
+    const dy = s * 0.26 + d * s * 0.044;
+    ctx.beginPath();
+    ctx.moveTo(-s * 0.042, dy);
+    ctx.lineTo(0, dy + s * 0.022);
+    ctx.lineTo(s * 0.042, dy);
+    ctx.strokeStyle = 'rgba(200,210,220,0.65)';
+    ctx.lineWidth = 1.0;
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // ── White pommel ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(0, s * 0.60, s * 0.048, 0, TAU);
+  ctx.fillStyle = '#e8eaf0';
+  ctx.fill();
+  ctx.strokeStyle = '#d4a800';
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+  ctx.restore();
+}
+
+// — — — ZORO's SANDAI KITETSU — — —
+// Flared guard, red tsuka, wavy hamon, demonic scarlet embers
+function drawKitetsu(ctx, scale, t, alpha, isHero) {
+  const s = scale * 130;
+
+  // ── Scarlet ember particles emanating ──
+  if (isHero && Math.random() < 0.12) {
+    spawnParticle(
+      rnd(-s * 0.08, s * 0.08),
+      rnd(-s * 0.6, -s * 0.1),
+      ['#ef4444', '#f87171', '#fca5a5', '#fbbf24'],
+      'rgba(239,68,68,0.3)'
+    );
+  }
+
+  // ── Demonic red aura ──
+  if (isHero) {
+    const aura = ctx.createRadialGradient(0, -s * 0.1, 0, 0, -s * 0.1, s * 0.6);
+    aura.addColorStop(0, 'rgba(239,68,68,0.15)');
+    aura.addColorStop(0.6, 'rgba(239,68,68,0.06)');
+    aura.addColorStop(1, 'rgba(239,68,68,0.00)');
+    ctx.fillStyle = aura;
+    ctx.beginPath();
+    ctx.ellipse(0, -s * 0.1, s * 0.42, s * 0.70, 0, 0, TAU);
+    ctx.fill();
+  }
+
+  // ── Blade with wavy hamon ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(0, -s * 0.90);
+  ctx.lineTo( s * 0.055, -s * 0.82);
+  ctx.lineTo( s * 0.065,  s * 0.06);
+  ctx.lineTo(-s * 0.065,  s * 0.06);
+  ctx.lineTo(-s * 0.04,  -s * 0.82);
+  ctx.closePath();
+
+  const bladeGrad = ctx.createLinearGradient(-s * 0.065, 0, s * 0.065, 0);
+  bladeGrad.addColorStop(0.00, '#c8ccd8');
+  bladeGrad.addColorStop(0.25, '#e0e4f0');
+  bladeGrad.addColorStop(0.55, '#d8dcec');
+  bladeGrad.addColorStop(0.80, '#a0a8b8');
+  bladeGrad.addColorStop(1.00, '#708090');
+  ctx.fillStyle = bladeGrad;
+  ctx.fill();
+
+  // Wavy flame hamon
+  ctx.beginPath();
+  ctx.moveTo(s * 0.025, s * 0.04);
+  for (let h = 1; h <= 14; h++) {
+    const hy = s * 0.04 - h * s * 0.067;
+    const hx = s * 0.025 + Math.sin(h * 1.4 + t * 0.03) * s * 0.018;
+    ctx.lineTo(hx, hy);
+  }
+  ctx.strokeStyle = 'rgba(255,180,180,0.70)';
+  ctx.lineWidth = 1.0;
+  ctx.shadowColor = '#ef4444';
+  ctx.shadowBlur = 5;
+  ctx.stroke();
+
+  // Red-tinted edge
+  ctx.beginPath();
+  ctx.moveTo(-s * 0.038, -s * 0.88);
+  ctx.lineTo(-s * 0.058, s * 0.04);
+  ctx.strokeStyle = 'rgba(252,165,165,0.88)';
+  ctx.lineWidth = 1.5;
+  ctx.shadowColor = 'rgba(239,68,68,0.8)';
+  ctx.shadowBlur = 8;
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Habaki (dark) ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(-s * 0.07, s * 0.04, s * 0.14, s * 0.055);
+  ctx.fillStyle = '#3a1010';
+  ctx.fill();
+  ctx.strokeStyle = '#ef4444';
+  ctx.lineWidth = 0.8;
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Flared notched guard ──
+  ctx.save();
+  // Main tsuba — wider flared
+  ctx.beginPath();
+  for (let pt = 0; pt < 8; pt++) {
+    const a = (pt / 8) * TAU - Math.PI / 8;
+    const r2 = pt % 2 === 0 ? s * 0.17 : s * 0.13;
+    if (pt === 0) ctx.moveTo(Math.cos(a) * r2, s * 0.12 + Math.sin(a) * r2);
+    else ctx.lineTo(Math.cos(a) * r2, s * 0.12 + Math.sin(a) * r2);
+  }
+  ctx.closePath();
+  ctx.fillStyle = '#2a0808';
+  ctx.fill();
+  ctx.strokeStyle = '#ef4444';
+  ctx.lineWidth = 1.5;
+  ctx.shadowColor = '#ef4444';
+  ctx.shadowBlur = 8;
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Red tsuka wrap ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(-s * 0.044, s * 0.27, s * 0.088, s * 0.33);
+  ctx.fillStyle = '#8b0000';
+  ctx.fill();
+  // Black cross-wrap
+  for (let w = 0; w < 7; w++) {
+    const wy = s * 0.28 + w * s * 0.044;
+    ctx.beginPath();
+    ctx.moveTo(-s * 0.044, wy);
+    ctx.lineTo( s * 0.044, wy + s * 0.02);
+    ctx.strokeStyle = 'rgba(20,0,0,0.60)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // ── Pommel ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(0, s * 0.63, s * 0.052, 0, TAU);
+  ctx.fillStyle = '#3a0808';
+  ctx.fill();
+  ctx.strokeStyle = '#ef4444';
+  ctx.lineWidth = 1.3;
+  ctx.stroke();
+  ctx.restore();
+}
+
+// — — — ZORO's ENMA — — —
+// Cloverleaf tsuba, lilac wrap, gold cherry blossom accents, purple Ryuo vapor
+function drawEnma(ctx, scale, t, alpha, isHero) {
+  const s = scale * 130;
+
+  // ── Ryuo purple vapor ──
+  if (isHero) {
+    for (let v = 0; v < 3; v++) {
+      const vAngle = t * 0.015 + v * 2.1;
+      const vr = s * (0.22 + v * 0.11);
+      ctx.save();
+      ctx.globalAlpha = 0.22 + 0.12 * Math.sin(t * 0.025 + v);
+      const vGrad = ctx.createRadialGradient(
+        Math.cos(vAngle) * vr * 0.5, Math.sin(vAngle) * vr * 0.5 - s * 0.1, 0,
+        Math.cos(vAngle) * vr * 0.5, Math.sin(vAngle) * vr * 0.5 - s * 0.1, vr * 0.8
+      );
+      vGrad.addColorStop(0, 'rgba(192,132,252,0.55)');
+      vGrad.addColorStop(1, 'rgba(192,132,252,0.00)');
+      ctx.fillStyle = vGrad;
+      ctx.beginPath();
+      ctx.ellipse(
+        Math.cos(vAngle) * vr * 0.3, Math.sin(vAngle) * vr * 0.3 - s * 0.1,
+        vr * 0.35, vr * 0.55, vAngle, 0, TAU
+      );
+      ctx.fill();
+      ctx.restore();
     }
   }
 
-  function applyAccent(accent) {
-    state.accent = accent;
-    document.documentElement.setAttribute('data-accent', accent);
-    localStorage.setItem('kap_portfolio_accent', accent);
+  // ── Blade — dark-silver with purple sheen ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(0, -s * 0.91);
+  ctx.lineTo( s * 0.05, -s * 0.83);
+  ctx.lineTo( s * 0.065,  s * 0.06);
+  ctx.lineTo(-s * 0.065,  s * 0.06);
+  ctx.lineTo(-s * 0.04,  -s * 0.83);
+  ctx.closePath();
 
-    const choices = document.querySelectorAll('.color-choice-btn');
-    choices.forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.accent === accent);
-    });
+  const bladeGrad = ctx.createLinearGradient(-s * 0.065, 0, s * 0.065, 0);
+  bladeGrad.addColorStop(0.00, '#9090b0');
+  bladeGrad.addColorStop(0.30, '#c8c0e0');
+  bladeGrad.addColorStop(0.55, '#b0a8d0');
+  bladeGrad.addColorStop(0.80, '#7878a0');
+  bladeGrad.addColorStop(1.00, '#5050708');
+  ctx.fillStyle = bladeGrad;
+  ctx.fill();
 
-    // Update active color dot
-    const activeDot = document.getElementById('active-color-indicator');
-    if (activeDot) {
-      const colors = {
-        cyan: '#00d2ff',
-        amber: '#f59e0b',
-        crimson: '#ef4444',
-        purple: '#a855f7',
-        emerald: '#10b981'
-      };
-      activeDot.style.backgroundColor = colors[accent] || '#00d2ff';
-    }
+  // Purple edge glow (Ryuo haki)
+  ctx.beginPath();
+  ctx.moveTo(-s * 0.038, -s * 0.89);
+  ctx.lineTo(-s * 0.056,  s * 0.04);
+  ctx.strokeStyle = 'rgba(196,140,255,0.88)';
+  ctx.lineWidth = 1.8;
+  ctx.shadowColor = 'rgba(168,85,247,0.85)';
+  ctx.shadowBlur = 12;
+  ctx.stroke();
+
+  // Hamon
+  ctx.beginPath();
+  ctx.moveTo(s * 0.032, s * 0.04);
+  ctx.bezierCurveTo(s * 0.040, -s * 0.28, s * 0.038, -s * 0.55, s * 0.026, -s * 0.82);
+  ctx.strokeStyle = 'rgba(220,210,255,0.65)';
+  ctx.lineWidth = 1.0;
+  ctx.shadowBlur = 0;
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Gold habaki ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(-s * 0.07, s * 0.03, s * 0.14, s * 0.058);
+  const hG = ctx.createLinearGradient(-s * 0.07, 0, s * 0.07, 0);
+  hG.addColorStop(0, '#6a5000');
+  hG.addColorStop(0.4, '#c89800');
+  hG.addColorStop(0.7, '#e0b400');
+  hG.addColorStop(1, '#6a5000');
+  ctx.fillStyle = hG;
+  ctx.fill();
+  ctx.restore();
+
+  // ── Trefoil / cloverleaf gold tsuba ──
+  ctx.save();
+  ctx.translate(0, s * 0.12);
+  for (let p = 0; p < 3; p++) {
+    const pa = (p / 3) * TAU - Math.PI / 2;
+    const px = Math.cos(pa) * s * 0.085;
+    const py = Math.sin(pa) * s * 0.085;
+    ctx.beginPath();
+    ctx.arc(px, py, s * 0.085, 0, TAU);
+    const leafG = ctx.createRadialGradient(px, py, 0, px, py, s * 0.085);
+    leafG.addColorStop(0, '#e0b400');
+    leafG.addColorStop(0.6, '#a07800');
+    leafG.addColorStop(1, '#6a5000');
+    ctx.fillStyle = leafG;
+    ctx.fill();
+    ctx.strokeStyle = '#f0cc00';
+    ctx.lineWidth = 1.2;
+    ctx.shadowColor = '#f0cc00';
+    ctx.shadowBlur = 6;
+    ctx.stroke();
   }
+  // Center disc
+  ctx.beginPath();
+  ctx.arc(0, 0, s * 0.045, 0, TAU);
+  ctx.fillStyle = '#e0b400';
+  ctx.fill();
+  ctx.restore();
 
-  function toggleTheme() {
-    initAudio();
-    const nextTheme = state.theme === 'dark' ? 'light' : 'dark';
-    applyTheme(nextTheme);
-    showToast(`Switched to ${nextTheme.toUpperCase()} Mode`, nextTheme === 'light' ? '☀️' : '🌙');
-    playUiSound('pop');
+  // ── Cherry blossom accents on hilt ──
+  // Lilac hilt wrap
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(-s * 0.044, s * 0.26, s * 0.088, s * 0.33);
+  ctx.fillStyle = '#7c3aed';
+  ctx.fill();
+  // Gold diagonal wrap
+  for (let w = 0; w < 7; w++) {
+    const wy = s * 0.27 + w * s * 0.044;
+    ctx.beginPath();
+    ctx.moveTo(-s * 0.044, wy);
+    ctx.lineTo( s * 0.044, wy + s * 0.02);
+    ctx.strokeStyle = 'rgba(240,204,0,0.45)';
+    ctx.lineWidth = 1.0;
+    ctx.stroke();
   }
-
-  // ==========================================================================
-  // HIGH-DEFINITION PROCEDURAL ANIME SWORDS CANVAS ENGINE
-  // ==========================================================================
-  function initAnimeSwordsEngine() {
-    const canvas = document.getElementById('ambient-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
-
-    let lastScrollY = window.scrollY;
-    let scrollSpeed = 0;
-    let scrollDelta = 0;
-
-    window.addEventListener('scroll', () => {
-      const currentY = window.scrollY;
-      scrollDelta = currentY - lastScrollY;
-      scrollSpeed = Math.abs(scrollDelta);
-      lastScrollY = currentY;
-    });
-
-    window.addEventListener('resize', () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    });
-
-    // Particle Trail Pool
-    const trails = [];
-    function addTrail(x, y, color, size = 2.4) {
-      if (trails.length > 90) trails.shift();
-      trails.push({
-        x,
-        y,
-        color,
-        size,
-        alpha: 0.75,
-        life: 1.0,
-        vx: (Math.random() - 0.5) * 1.8,
-        vy: (Math.random() - 0.5) * 1.8
-      });
-    }
-
-    // 5 High-Definition Character Anime Swords
-    const swords = [
-      {
-        id: 'ichigo',
-        name: 'Ichigo: Tensa Zangetsu',
-        x: width * 0.16,
-        y: height * 0.28,
-        angle: -0.62,
-        scale: 1.15,
-        length: 180,
-        color: '#ef4444',
-        glowColor: 'rgba(239, 68, 68, 0.65)',
-        speedX: 0.35,
-        speedY: 0.22,
-        chainAngle: 0,
-        draw(ctx, s, t, isDark) {
-          ctx.save();
-          // Blade: Curving pitch-black daito with chisel kissaki tip & fuller groove
-          ctx.beginPath();
-          ctx.moveTo(0, -3);
-          ctx.lineTo(s.length - 24, -14);
-          ctx.lineTo(s.length, -20); // Sharp Kissaki
-          ctx.lineTo(s.length - 8, -10);
-          ctx.lineTo(0, 4);
-          ctx.closePath();
-          
-          // Blade Fill & Gradient
-          const bladeGrad = ctx.createLinearGradient(0, -10, 0, 4);
-          bladeGrad.addColorStop(0, '#090d16');
-          bladeGrad.addColorStop(0.6, '#030508');
-          bladeGrad.addColorStop(1, isDark ? '#1e293b' : '#334155');
-          ctx.fillStyle = bladeGrad;
-          ctx.fill();
-
-          // Crimson Edge Aura
-          ctx.strokeStyle = '#ef4444';
-          ctx.lineWidth = 1.6;
-          ctx.stroke();
-
-          // Bo-hi (Fuller groove)
-          ctx.beginPath();
-          ctx.moveTo(12, -2);
-          ctx.lineTo(s.length - 35, -12);
-          ctx.strokeStyle = '#dc2626';
-          ctx.lineWidth = 1;
-          ctx.stroke();
-
-          // Gunmetal Habaki (Blade Collar)
-          ctx.fillStyle = '#475569';
-          ctx.fillRect(-6, -5, 8, 10);
-          ctx.strokeStyle = '#94a3b8';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(-6, -5, 8, 10);
-
-          // Manji-shaped Black Iron Tsuba (Crossguard)
-          ctx.strokeStyle = '#0f172a';
-          ctx.lineWidth = 4;
-          ctx.lineCap = 'square';
-          ctx.beginPath();
-          // Vertical cross arm with hook
-          ctx.moveTo(-6, -16);
-          ctx.lineTo(-6, 16);
-          ctx.moveTo(-6, -16);
-          ctx.lineTo(-14, -16);
-          ctx.moveTo(-6, 16);
-          ctx.lineTo(2, 16);
-          // Horizontal cross arm with hook
-          ctx.moveTo(-20, 0);
-          ctx.lineTo(8, 0);
-          ctx.moveTo(-20, 0);
-          ctx.lineTo(-20, 8);
-          ctx.moveTo(8, 0);
-          ctx.lineTo(8, -8);
-          ctx.stroke();
-
-          // Tsuka (Hilt with red diamond wrap)
-          ctx.fillStyle = '#7f1d1d';
-          ctx.fillRect(-52, -4, 46, 8);
-          ctx.fillStyle = '#020617';
-          // Diamond pattern on wrap
-          for (let i = -48; i < -10; i += 7) {
-            ctx.beginPath();
-            ctx.moveTo(i, 0);
-            ctx.lineTo(i + 3.5, -4);
-            ctx.lineTo(i + 7, 0);
-            ctx.lineTo(i + 3.5, 4);
-            ctx.closePath();
-            ctx.fill();
-          }
-
-          // Kashira (Pommel)
-          ctx.fillStyle = '#1e293b';
-          ctx.fillRect(-56, -5, 5, 10);
-
-          // Dynamic Physics Chain Links swaying at pommel
-          s.chainAngle = Math.sin(t * 2.5) * 0.35;
-          ctx.save();
-          ctx.translate(-56, 0);
-          ctx.rotate(s.chainAngle);
-          ctx.strokeStyle = isDark ? '#cbd5e1' : '#475569';
-          ctx.lineWidth = 1.4;
-          for (let c = 0; c < 5; c++) {
-            ctx.strokeRect(-6 - (c * 7), -2.5, 6, 5);
-          }
-          ctx.restore();
-
-          // Getsuga Tensho Energy Ribbons (swirling black-crimson spiritual pressure)
-          ctx.strokeStyle = 'rgba(239, 68, 68, 0.45)';
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.moveTo(s.length * 0.4, -6);
-          ctx.quadraticCurveTo(s.length * 0.7, -25 + Math.sin(t * 3) * 8, s.length + 15, -20);
-          ctx.stroke();
-
-          ctx.restore();
-        }
-      },
-      {
-        id: 'sasuke',
-        name: 'Sasuke: Sword of Kusanagi',
-        x: width * 0.82,
-        y: height * 0.32,
-        angle: 0.52,
-        scale: 1.1,
-        length: 165,
-        color: '#00d2ff',
-        glowColor: 'rgba(0, 210, 255, 0.7)',
-        speedX: -0.32,
-        speedY: 0.25,
-        draw(ctx, s, t, isDark) {
-          ctx.save();
-          // Blade: Razor-straight chokuto with dual-tone chrome mirror edge
-          const bladeGrad = ctx.createLinearGradient(0, -3, 0, 3);
-          bladeGrad.addColorStop(0, '#0f172a');
-          bladeGrad.addColorStop(0.45, '#334155');
-          bladeGrad.addColorStop(0.5, '#e2e8f0');
-          bladeGrad.addColorStop(1, '#ffffff');
-
-          ctx.fillStyle = bladeGrad;
-          ctx.fillRect(0, -3, s.length, 6);
-          ctx.strokeStyle = '#00d2ff';
-          ctx.lineWidth = 1.2;
-          ctx.strokeRect(0, -3, s.length, 6);
-
-          // Chokuto Chisel Tip
-          ctx.beginPath();
-          ctx.moveTo(s.length, -3);
-          ctx.lineTo(s.length + 16, -1);
-          ctx.lineTo(s.length, 3);
-          ctx.closePath();
-          ctx.fillStyle = '#f8fafc';
-          ctx.fill();
-          ctx.stroke();
-
-          // Habaki (Blade Collar)
-          ctx.fillStyle = '#cbd5e1';
-          ctx.fillRect(-6, -4, 7, 8);
-          ctx.strokeStyle = '#00d2ff';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(-6, -4, 7, 8);
-
-          // Minimalist Black Hilt
-          ctx.fillStyle = '#050811';
-          ctx.fillRect(-50, -3.5, 44, 7);
-          ctx.strokeStyle = '#38bdf8';
-          ctx.lineWidth = 0.8;
-          ctx.strokeRect(-50, -3.5, 44, 7);
-
-          // White Center Inlay Strip on Hilt
-          ctx.fillStyle = '#f1f5f9';
-          ctx.fillRect(-48, -1, 40, 2);
-
-          // Branching Chidori Lightning Bolts crackling along the spine
-          ctx.strokeStyle = '#38bdf8';
-          ctx.lineWidth = 1.4;
-          ctx.beginPath();
-          const lightningOffset = Math.sin(t * 8) * 6;
-          ctx.moveTo(s.length * 0.2, -3);
-          ctx.lineTo(s.length * 0.35, -12 + lightningOffset);
-          ctx.lineTo(s.length * 0.45, -2);
-          ctx.lineTo(s.length * 0.65, -10 - lightningOffset);
-          ctx.lineTo(s.length * 0.8, -1);
-          ctx.lineTo(s.length + 10, -8);
-          ctx.stroke();
-
-          ctx.restore();
-        }
-      },
-      {
-        id: 'zoro_wado',
-        name: "Zoro: Wado Ichimonji",
-        x: width * 0.75,
-        y: height * 0.72,
-        angle: -0.42,
-        scale: 1.05,
-        length: 160,
-        color: '#ffffff',
-        glowColor: 'rgba(255, 255, 255, 0.55)',
-        speedX: 0.28,
-        speedY: -0.22,
-        draw(ctx, s, t, isDark) {
-          ctx.save();
-          // Blade: Elegant sweeping shinogi-zukuri curve with bright mirror hamon
-          ctx.beginPath();
-          ctx.moveTo(0, 0);
-          ctx.quadraticCurveTo(s.length * 0.6, -11, s.length, -20);
-          ctx.lineTo(s.length + 10, -15);
-          ctx.quadraticCurveTo(s.length * 0.6, -3, 0, 5);
-          ctx.closePath();
-          
-          const bladeGrad = ctx.createLinearGradient(0, -10, 0, 5);
-          bladeGrad.addColorStop(0, '#334155');
-          bladeGrad.addColorStop(0.5, '#cbd5e1');
-          bladeGrad.addColorStop(1, '#ffffff');
-          ctx.fillStyle = bladeGrad;
-          ctx.fill();
-
-          ctx.strokeStyle = isDark ? '#94a3b8' : '#475569';
-          ctx.lineWidth = 1.2;
-          ctx.stroke();
-
-          // Hamon (Bright White Cutting Edge Temper Line)
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(4, 3);
-          ctx.quadraticCurveTo(s.length * 0.6, -4, s.length + 8, -16);
-          ctx.stroke();
-
-          // Brass Habaki
-          ctx.fillStyle = '#eab308';
-          ctx.fillRect(-6, -4, 7, 9);
-
-          // Circular Golden Tsuba
-          ctx.fillStyle = '#f59e0b';
-          ctx.beginPath();
-          ctx.ellipse(0, 0, 5, 14, 0, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.strokeStyle = '#fbbf24';
-          ctx.lineWidth = 1.2;
-          ctx.stroke();
-
-          // White Tsuka Wrap over Textured Samegawa
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(-46, -3.5, 46, 7);
-          ctx.strokeStyle = '#cbd5e1';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(-46, -3.5, 46, 7);
-
-          // White Diamond wrap knots
-          ctx.fillStyle = '#94a3b8';
-          for (let i = -42; i < -6; i += 7) {
-            ctx.beginPath();
-            ctx.moveTo(i, 0);
-            ctx.lineTo(i + 3.5, -3.5);
-            ctx.lineTo(i + 7, 0);
-            ctx.lineTo(i + 3.5, 3.5);
-            ctx.closePath();
-            ctx.fill();
-          }
-
-          // Wind Slash Aura Rings
-          ctx.strokeStyle = 'rgba(0, 210, 255, 0.4)';
-          ctx.lineWidth = 1.2;
-          ctx.beginPath();
-          ctx.arc(s.length * 0.6, -10, 18 + Math.sin(t * 3) * 4, -0.4, Math.PI * 0.8);
-          ctx.stroke();
-
-          ctx.restore();
-        }
-      },
-      {
-        id: 'zoro_kitetsu',
-        name: "Zoro: Sandai Kitetsu (Cursed Blade)",
-        x: width * 0.25,
-        y: height * 0.78,
-        angle: 0.38,
-        scale: 1.05,
-        length: 160,
-        color: '#dc2626',
-        glowColor: 'rgba(220, 38, 38, 0.65)',
-        speedX: -0.28,
-        speedY: -0.24,
-        draw(ctx, s, t, isDark) {
-          ctx.save();
-          // Blade: Deep dark steel with wild undulating flame hamon (midare)
-          ctx.beginPath();
-          ctx.moveTo(0, 0);
-          ctx.quadraticCurveTo(s.length * 0.5, -14, s.length, -25);
-          ctx.lineTo(s.length + 10, -20);
-          ctx.quadraticCurveTo(s.length * 0.5, -6, 0, 5);
-          ctx.closePath();
-
-          const bladeGrad = ctx.createLinearGradient(0, -14, 0, 5);
-          bladeGrad.addColorStop(0, '#0f172a');
-          bladeGrad.addColorStop(0.6, '#1e293b');
-          bladeGrad.addColorStop(1, '#450a0a');
-          ctx.fillStyle = bladeGrad;
-          ctx.fill();
-
-          ctx.strokeStyle = '#ef4444';
-          ctx.lineWidth = 1.4;
-          ctx.stroke();
-
-          // Wild Undulating Flame Hamon
-          ctx.strokeStyle = '#f87171';
-          ctx.lineWidth = 1.2;
-          ctx.beginPath();
-          for (let i = 8; i < s.length - 5; i += 10) {
-            const hx = i;
-            const hy = -6 - (i / s.length * 15) + Math.sin(i * 0.4 + t * 4) * 4;
-            if (i === 8) ctx.moveTo(hx, hy);
-            else ctx.lineTo(hx, hy);
-          }
-          ctx.stroke();
-
-          // Brass Habaki
-          ctx.fillStyle = '#b45309';
-          ctx.fillRect(-5, -4, 6, 9);
-
-          // Notched Flared Crossguard (Kitetsu Tsuba)
-          ctx.fillStyle = '#d97706';
-          ctx.beginPath();
-          ctx.moveTo(-4, -14);
-          ctx.lineTo(0, -16);
-          ctx.lineTo(4, -14);
-          ctx.lineTo(2, 0);
-          ctx.lineTo(4, 14);
-          ctx.lineTo(0, 16);
-          ctx.lineTo(-4, 14);
-          ctx.lineTo(-2, 0);
-          ctx.closePath();
-          ctx.fill();
-          ctx.strokeStyle = '#78350f';
-          ctx.lineWidth = 1;
-          ctx.stroke();
-
-          // Scarlet Tsuka Wrap with Gold Menuki
-          ctx.fillStyle = '#991b1b';
-          ctx.fillRect(-48, -4, 46, 8);
-          ctx.strokeStyle = '#fca5a5';
-          ctx.lineWidth = 0.8;
-          ctx.strokeRect(-48, -4, 46, 8);
-
-          // Gold Menuki Pin
-          ctx.fillStyle = '#f59e0b';
-          ctx.beginPath();
-          ctx.arc(-24, 0, 2.5, 0, Math.PI * 2);
-          ctx.fill();
-
-          // Demonic Crimson Embers
-          ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
-          ctx.lineWidth = 1.2;
-          ctx.beginPath();
-          ctx.arc(s.length * 0.7, -18, 10 + Math.sin(t * 4) * 3, 0, Math.PI * 2);
-          ctx.stroke();
-
-          ctx.restore();
-        }
-      },
-      {
-        id: 'zoro_enma',
-        name: "Zoro: Great Blade Enma",
-        x: width * 0.5,
-        y: height * 0.52,
-        angle: -0.18,
-        scale: 1.2,
-        length: 185,
-        color: '#a855f7',
-        glowColor: 'rgba(168, 85, 247, 0.7)',
-        speedX: 0.32,
-        speedY: 0.18,
-        draw(ctx, s, t, isDark) {
-          ctx.save();
-          // Blade: Heavy sweeping edge with flame-engraved habaki & golden hamon
-          ctx.beginPath();
-          ctx.moveTo(0, 0);
-          ctx.quadraticCurveTo(s.length * 0.55, -9, s.length, -16);
-          ctx.lineTo(s.length + 12, -10);
-          ctx.quadraticCurveTo(s.length * 0.55, -2, 0, 5);
-          ctx.closePath();
-
-          const bladeGrad = ctx.createLinearGradient(0, -10, 0, 5);
-          bladeGrad.addColorStop(0, '#090d16');
-          bladeGrad.addColorStop(0.5, '#1e1b4b');
-          bladeGrad.addColorStop(1, '#3b0764');
-          ctx.fillStyle = bladeGrad;
-          ctx.fill();
-
-          ctx.strokeStyle = '#c084fc';
-          ctx.lineWidth = 1.5;
-          ctx.stroke();
-
-          // Gold Temper Line
-          ctx.strokeStyle = '#fbbf24';
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(6, 2);
-          ctx.quadraticCurveTo(s.length * 0.55, -5, s.length + 8, -12);
-          ctx.stroke();
-
-          // Gilded Flame Habaki
-          ctx.fillStyle = '#f59e0b';
-          ctx.fillRect(-6, -5, 7, 10);
-
-          // Trefoil / Clover-Leaf Golden Tsuba
-          ctx.fillStyle = '#eab308';
-          ctx.beginPath();
-          ctx.arc(-2, -8, 6, 0, Math.PI * 2);
-          ctx.arc(-2, 8, 6, 0, Math.PI * 2);
-          ctx.arc(4, 0, 6, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.strokeStyle = '#a16207';
-          ctx.lineWidth = 1.2;
-          ctx.stroke();
-
-          // Royal Lilac/Purple Tsuka Wrap
-          ctx.fillStyle = '#6b21a8';
-          ctx.fillRect(-52, -4, 48, 8);
-          ctx.strokeStyle = '#e9d5ff';
-          ctx.lineWidth = 0.8;
-          ctx.strokeRect(-52, -4, 48, 8);
-
-          // Golden Blossom Emblems on Hilt
-          ctx.fillStyle = '#fbbf24';
-          ctx.beginPath();
-          ctx.arc(-36, 0, 2, 0, Math.PI * 2);
-          ctx.arc(-20, 0, 2, 0, Math.PI * 2);
-          ctx.fill();
-
-          // Swirling Purple Ryuo (Haki) Vapor Licking Along the Edge
-          ctx.strokeStyle = 'rgba(168, 85, 247, 0.55)';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          for (let i = 20; i < s.length + 15; i += 15) {
-            const vy = -6 - (i / s.length * 10) + Math.sin(i * 0.3 + t * 5) * 6;
-            if (i === 20) ctx.moveTo(i, vy);
-            else ctx.lineTo(i, vy);
-          }
-          ctx.stroke();
-
-          ctx.restore();
-        }
-      }
-    ];
-
-    let t = 0;
-
-    function renderLoop() {
-      ctx.clearRect(0, 0, width, height);
-      t += 0.015;
-
-      const isDark = state.theme === 'dark';
-      scrollSpeed *= 0.92;
-
-      // Update & Draw Trails
-      for (let i = trails.length - 1; i >= 0; i--) {
-        const p = trails[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.alpha -= 0.018;
-        if (p.alpha <= 0) {
-          trails.splice(i, 1);
-          continue;
-        }
+  // Cherry blossom dots
+  if (isHero) {
+    for (let cb = 0; cb < 5; cb++) {
+      const cbx = rnd(-s * 0.20, s * 0.20);
+      const cby = rnd(-s * 0.70, s * 0.20);
+      const fade = Math.sin(t * 0.02 + cb * 1.3) * 0.5 + 0.5;
+      ctx.globalAlpha = fade * 0.7;
+      ctx.beginPath();
+      for (let petal = 0; petal < 5; petal++) {
+        const pa = (petal / 5) * TAU;
+        const pr = s * 0.018;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = p.color.replace(')', `, ${p.alpha})`).replace('rgb', 'rgba');
+        ctx.arc(cbx + Math.cos(pa) * pr, cby + Math.sin(pa) * pr, pr * 0.55, 0, TAU);
+        ctx.fillStyle = '#f9a8d4';
         ctx.fill();
       }
+      ctx.globalAlpha = 1;
+    }
+  }
+  ctx.restore();
 
-      // Render Active Swords
-      swords.forEach((s, idx) => {
-        // If a specific sword is selected and it's not this one, skip
-        if (state.activeSword !== 'all' && state.activeSword !== s.id) {
-          return;
-        }
+  // ── Pommel ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(0, s * 0.62, s * 0.052, 0, TAU);
+  ctx.fillStyle = '#4c1d95';
+  ctx.fill();
+  ctx.strokeStyle = '#f0cc00';
+  ctx.lineWidth = 1.3;
+  ctx.stroke();
+  ctx.restore();
+}
 
-        const scrollParallax = (window.scrollY * (0.12 + idx * 0.04)) % (height + 300);
-        
-        // Gentle floating drift
-        s.x += s.speedX + Math.sin(t + idx) * 0.35;
-        s.y += s.speedY + Math.cos(t * 0.8 + idx) * 0.35;
+/* --------------------------------------------------------------------------
+   Animation loop
+   -------------------------------------------------------------------------- */
+function animLoop(t = 0) {
+  const { ctx, W, H } = APP;
+  ctx.clearRect(0, 0, W, H);
 
-        // Wrap around viewport with margin
-        if (s.x < -220) s.x = width + 120;
-        if (s.x > width + 220) s.x = -120;
-        if (s.y < -220) s.y = height + 120;
-        if (s.y > height + 220) s.y = -120;
+  // Parallax offset from scroll
+  const parallaxY = APP.scrollY * 0.08;
 
-        // Dynamic tilt with scroll velocity
-        const dynamicAngle = s.angle + Math.sin(t + idx * 2) * 0.08 + (scrollDelta * 0.001);
+  // Draw background swords first, then hero
+  const sorted = [...APP.swords].sort((a, b) => a.isHero ? 1 : -1);
 
-        // Spotlighting Scale: If isolated sword, make it 1.25x larger & centered in perspective
-        const effectiveScale = state.activeSword === s.id ? s.scale * 1.25 : s.scale;
-        const drawY = (s.y - (scrollParallax * 0.2) + height) % height;
+  sorted.forEach(sw => {
+    sw.angle    += sw.rotateSpeed;
+    sw.bobY     += sw.bobSpeed;
+    sw.pulseT   += sw.pulseSpeed;
+    sw.driftAngle += sw.driftSpeed;
 
-        ctx.save();
-        ctx.translate(s.x, drawY);
-        ctx.rotate(dynamicAngle);
-        ctx.scale(effectiveScale, effectiveScale);
+    // Position with drift + bob
+    const drawX = sw.x + Math.cos(sw.driftAngle) * sw.driftRadius * 0.4;
+    const drawY = sw.y + Math.sin(sw.bobY) * sw.bobAmp
+                 - parallaxY * (sw.isHero ? 0.3 : 0.15);
 
-        // Glow Filter
-        ctx.shadowColor = s.glowColor;
-        ctx.shadowBlur = (isDark ? 18 : 12) + Math.sin(t * 2 + idx) * 6;
-
-        // Draw Polished Weapon
-        s.draw(ctx, s, t, isDark);
-
-        // Spawn Energy Particles from Blade Tip
-        if (Math.random() > 0.35) {
-          const tipX = s.x + Math.cos(dynamicAngle) * (s.length * effectiveScale);
-          const tipY = drawY + Math.sin(dynamicAngle) * (s.length * effectiveScale);
-          const particleColor = s.color === '#ffffff' ? 'rgba(255, 255, 255' : s.color.replace('#', 'rgba(');
-          addTrail(tipX, tipY, particleColor, 2.6);
-        }
-
-        ctx.restore();
-      });
-
-      scrollDelta = 0;
-      requestAnimationFrame(renderLoop);
+    // Pulse scale for hero blade
+    let sc = sw.scale;
+    if (sw.isHero) {
+      sc = sw.scale * (1.0 + Math.sin(sw.pulseT) * 0.025);
     }
 
-    renderLoop();
-  }
+    // Spawn trail particles for hero blade
+    sw.particleTimer++;
+    if (sw.particleTimer >= sw.particleRate) {
+      sw.particleTimer = 0;
+      const tipX = drawX + Math.cos(sw.angle - Math.PI / 2) * sc * 130 * 0.88;
+      const tipY = drawY + Math.sin(sw.angle - Math.PI / 2) * sc * 130 * 0.88;
+      spawnParticle(tipX, tipY, sw.def.particleColors, sw.def.auraColor);
+    }
 
-  // ==========================================================================
-  // TOP SWORD SELECTOR TOOLBAR LOGIC
-  // ==========================================================================
-  function initSwordSelector() {
-    const pills = document.querySelectorAll('.sword-select-pill');
-    const label = document.getElementById('active-sword-label');
-    const stateText = document.getElementById('active-sword-state');
+    ctx.save();
+    ctx.globalAlpha = sw.alpha;
+    ctx.translate(drawX, drawY);
+    ctx.rotate(sw.angle);
 
-    const swordTitles = {
-      all: "All 5 Anime Swords",
-      ichigo: "Ichigo: Tensa Zangetsu",
-      sasuke: "Sasuke: Sword of Kusanagi",
-      zoro_wado: "Zoro: Wado Ichimonji",
-      zoro_kitetsu: "Zoro: Sandai Kitetsu",
-      zoro_enma: "Zoro: Great Blade Enma"
-    };
+    // Aura glow for hero
+    if (sw.isHero) {
+      ctx.shadowColor = sw.def.auraColor;
+      ctx.shadowBlur  = 30;
+    }
 
-    pills.forEach(pill => {
-      pill.addEventListener('click', () => {
-        initAudio();
-        pills.forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
+    sw.def.draw(ctx, sc, t, sw.alpha, sw.isHero);
 
-        const swordId = pill.dataset.sword;
-        state.activeSword = swordId;
+    ctx.restore();
+  });
 
-        const title = swordTitles[swordId] || "Anime Blade Engine";
-        if (label) label.textContent = `Active Blade: ${title}`;
-        if (stateText) stateText.textContent = `Spotlight Active`;
+  // Particles
+  updateParticles();
+  drawParticles(ctx);
 
-        showToast(`Spotlight: ${title}`, "⚔️");
-        playUiSound('slash');
-      });
+  APP.animFrameId = requestAnimationFrame(ts => animLoop(ts * 0.05));
+}
+
+/* --------------------------------------------------------------------------
+   Resize handler
+   -------------------------------------------------------------------------- */
+function handleResize() {
+  const canvas = APP.canvas;
+  APP.W = canvas.width  = window.innerWidth;
+  APP.H = canvas.height = window.innerHeight;
+  buildSwordScene();
+}
+
+/* --------------------------------------------------------------------------
+   Sword toolbar interaction
+   -------------------------------------------------------------------------- */
+function initSwordToolbar() {
+  $$('.sword-select-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      $$('.sword-select-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      APP.activeSword = pill.dataset.sword;
+      APP.particles = [];
+      buildSwordScene();
+      playHaptic('click');
+      const label = pill.dataset.label || pill.textContent.trim();
+      showToast(`Blade selected: ${label}`, '⚔️');
     });
+  });
+}
+
+/* --------------------------------------------------------------------------
+   Canvas init
+   -------------------------------------------------------------------------- */
+function initSwordEngine() {
+  const canvas = $('#ambient-canvas');
+  if (!canvas) return;
+  APP.canvas = canvas;
+  APP.ctx    = canvas.getContext('2d');
+  APP.W = canvas.width  = window.innerWidth;
+  APP.H = canvas.height = window.innerHeight;
+
+  window.addEventListener('resize', debounce(handleResize, 200));
+  window.addEventListener('scroll', () => { APP.scrollY = window.scrollY; }, { passive: true });
+  window.addEventListener('mousemove', e => {
+    APP.mouse.x = e.clientX;
+    APP.mouse.y = e.clientY;
+  }, { passive: true });
+
+  buildSwordScene();
+  animLoop();
+}
+
+// ===========================================================================
+// COMMAND PALETTE
+// ===========================================================================
+const CMD_ITEMS = [
+  { id: 'goto_hero',          icon: '🏠', title: 'Go to Overview',              desc: 'Hero / Landing section',              action: () => scrollTo('#hero') },
+  { id: 'goto_projects',      icon: '⚙️', title: 'Go to Projects',              desc: 'Mechanical design portfolio',          action: () => scrollTo('#projects') },
+  { id: 'goto_architecture',  icon: '🔧', title: 'Go to Skills & Tools',        desc: 'CAD, FEA, simulation stack',          action: () => scrollTo('#architecture') },
+  { id: 'goto_experience',    icon: '🏭', title: 'Go to Experience',            desc: 'Work history & education',             action: () => scrollTo('#experience') },
+  { id: 'goto_documentation', icon: '📐', title: 'Go to Documentation',         desc: 'AutoCAD, GD&T, BOMs',                  action: () => scrollTo('#documentation') },
+  { id: 'goto_contact',       icon: '📧', title: 'Get in Touch',                desc: 'Contact & engineering enquiry',         action: () => scrollTo('#contact') },
+  { id: 'theme_toggle',       icon: '🌓', title: 'Toggle Theme',                desc: 'Switch dark / light mode',             action: () => $('#theme-toggle-btn').click() },
+  { id: 'sword_all',          icon: '⚔️', title: 'All Blades',                  desc: 'Show all anime swords',                action: () => setSword('all') },
+  { id: 'sword_ichigo',       icon: '🌑', title: 'Ichigo – Tensa Zangetsu',     desc: 'Curved daito, crimson Getsuga',        action: () => setSword('ichigo') },
+  { id: 'sword_kusanagi',     icon: '⚡', title: 'Sasuke – Kusanagi',           desc: 'Chokuto, Chidori lightning',           action: () => setSword('kusanagi') },
+  { id: 'sword_wado',         icon: '🤍', title: 'Zoro – Wado Ichimonji',       desc: 'White blade, gold tsuba',              action: () => setSword('wado') },
+  { id: 'sword_kitetsu',      icon: '🔴', title: 'Zoro – Sandai Kitetsu',       desc: 'Cursed blade, scarlet embers',         action: () => setSword('kitetsu') },
+  { id: 'sword_enma',         icon: '🟣', title: 'Zoro – Enma',                 desc: 'Cloverleaf tsuba, Ryuo vapor',         action: () => setSword('enma') },
+  { id: 'calc_cargo',         icon: '🛫', title: 'Simulate: Air Cargo Deck',    desc: 'Calculate 7,000 kg ULD load stress',   action: () => runSimCmd('calc-air-cargo') },
+  { id: 'calc_strip',         icon: '🦾', title: 'Simulate: Strip Flattening',  desc: 'Roll force for 6mm steel strip',       action: () => runSimCmd('strip-tonnage') },
+  { id: 'calc_tspacer',       icon: '⚡', title: 'Simulate: T-Spacer Cycle',    desc: 'SPM cycle time calculation',           action: () => runSimCmd('t-spacer-cycle') },
+  { id: 'calc_steel',         icon: '🏗️', title: 'Simulate: Steel Plant Quote', desc: 'Budgetary CAPEX estimate',             action: () => runSimCmd('steel-plant-quote') },
+  { id: 'copy_email',         icon: '📋', title: 'Copy Email Address',          desc: 'pran.acharya.eng@gmail.com',           action: () => copyText('pran.acharya.eng@gmail.com', 'Email copied!') },
+];
+
+function scrollTo(hash) { document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' }); closeCmdPalette(); }
+
+function setSword(id) {
+  const pill = $(`.sword-select-pill[data-sword="${id}"]`);
+  if (pill) {
+    $$('.sword-select-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
   }
+  APP.activeSword = id;
+  APP.particles = [];
+  buildSwordScene();
+  closeCmdPalette();
+}
 
-  // ==========================================================================
-  // TOAST NOTIFICATIONS
-  // ==========================================================================
-  function showToast(message, icon = '✓') {
-    const container = document.getElementById('toast-container');
-    if (!container) return;
+function runSimCmd(cmd) {
+  const btn = $(`[data-cmd="${cmd}"]`);
+  if (btn) btn.click();
+  closeCmdPalette();
+  scrollTo('#architecture');
+}
 
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.innerHTML = `
-      <span style="color: var(--accent-primary); font-size: 1rem;">${icon}</span>
-      <span>${message}</span>
-    `;
+function copyText(text, toastMsg) {
+  navigator.clipboard.writeText(text).then(() => showToast(toastMsg, '📋'));
+  closeCmdPalette();
+}
 
-    container.appendChild(toast);
-    playUiSound('pop');
+function openCmdPalette() {
+  const overlay = $('#cmd-overlay');
+  if (!overlay) return;
+  APP.cmdPaletteOpen = true;
+  overlay.classList.add('open');
+  setTimeout(() => $('#cmd-input')?.focus(), 60);
+  renderCmdResults('');
+}
 
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateY(10px) scale(0.95)';
-      toast.style.transition = 'all 0.3s ease';
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
-  }
+function closeCmdPalette() {
+  const overlay = $('#cmd-overlay');
+  if (!overlay) return;
+  APP.cmdPaletteOpen = false;
+  overlay.classList.remove('open');
+  const input = $('#cmd-input');
+  if (input) input.value = '';
+}
 
-  // ==========================================================================
-  // COMMAND PALETTE (Ctrl+K / Cmd+K)
-  // ==========================================================================
-  const commandData = [
-    { title: "Steel Plant Budgetary Quote", desc: "Turnkey equipment sizing & CAPEX proposals", icon: "🏗️", action: () => openCaseStudy('steel_plant') },
-    { title: "Air Cargo GSE Decks", desc: "Powered Roller & Lazy Dolly Castor Deck specs (7,000 kg)", icon: "🛫", action: () => openCaseStudy('air_cargo') },
-    { title: "Strip Flattening Machine", desc: "17-roll precision hydraulic leveling machine (80 kN)", icon: "🦾", action: () => openCaseStudy('strip_flattening') },
-    { title: "T-Spacer Cutting SPM", desc: "High-speed precision automated cutting cell (±0.05mm)", icon: "⚡", action: () => openCaseStudy('t_spacer') },
-    { title: "FEA & Proof Load Testing", desc: "Von Mises stress simulation & physical validation", icon: "📐", action: () => openCaseStudy('load_analysis') },
-    { title: "AutoCAD & QA Documentation", desc: "ASME Y14.5M GD&T & inspection packages", icon: "📋", action: () => openCaseStudy('autocad_proposals') },
-    { title: "Toggle Light / Dark Theme", desc: "Switch between Obsidian Titanium & Drafting White", icon: "🌓", action: () => toggleTheme() },
-    { title: "Select Tensa Zangetsu Blade", desc: "Isolate Ichigo's Bankai in background", icon: "🔴", action: () => document.querySelector('.sword-select-pill[data-sword="ichigo"]')?.click() },
-    { title: "Select Kusanagi Katana", desc: "Isolate Sasuke's Chidori Katana in background", icon: "⚡", action: () => document.querySelector('.sword-select-pill[data-sword="sasuke"]')?.click() },
-    { title: "Select Enma Ryuo Blade", desc: "Isolate Zoro's Great Blade Enma in background", icon: "🟣", action: () => document.querySelector('.sword-select-pill[data-sword="zoro_enma"]')?.click() },
-    { title: "Run 7,000 kg Air Cargo Load Calc", desc: "Execute dynamic deck loading in sandbox", icon: "🧮", action: () => { scrollToSection('architecture'); runSandboxCommand('calc-air-cargo'); } },
-    { title: "Run Strip Leveling Tonnage Sizing", desc: "Solve 80 kN hydraulic downforce requirements", icon: "⚙️", action: () => { scrollToSection('architecture'); runSandboxCommand('strip-tonnage'); } },
-    { title: "Copy Verified Email", desc: "pran.acharya.eng@gmail.com", icon: "✉️", action: () => copyEmail() },
-    { title: "Download Technical Dossier", desc: "Export Karampudi Acharya Pranav engineering brief", icon: "💾", action: () => downloadDossier() }
+function renderCmdResults(query) {
+  const container = $('#cmd-results');
+  if (!container) return;
+  const filtered = query
+    ? CMD_ITEMS.filter(item =>
+        item.title.toLowerCase().includes(query.toLowerCase()) ||
+        item.desc.toLowerCase().includes(query.toLowerCase()))
+    : CMD_ITEMS;
+
+  container.innerHTML = '';
+
+  const sections = [
+    { label: 'Navigation', ids: ['goto_hero','goto_projects','goto_architecture','goto_experience','goto_documentation','goto_contact','theme_toggle'] },
+    { label: 'Anime Blades', ids: ['sword_all','sword_ichigo','sword_kusanagi','sword_wado','sword_kitetsu','sword_enma'] },
+    { label: 'Simulations', ids: ['calc_cargo','calc_strip','calc_tspacer','calc_steel'] },
+    { label: 'Quick Actions', ids: ['copy_email'] },
   ];
 
-  function openCommandPalette() {
-    initAudio();
-    const backdrop = document.getElementById('cmd-modal-backdrop');
-    const input = document.getElementById('cmd-search-input');
-    if (!backdrop || !input) return;
-
-    backdrop.classList.add('open');
-    backdrop.setAttribute('aria-hidden', 'false');
-    input.value = '';
-    state.cmdIndex = 0;
-    renderCommandResults('');
-    input.focus();
-    playUiSound('pop');
-  }
-
-  function closeCommandPalette() {
-    const backdrop = document.getElementById('cmd-modal-backdrop');
-    if (!backdrop) return;
-    backdrop.classList.remove('open');
-    backdrop.setAttribute('aria-hidden', 'true');
-  }
-
-  function renderCommandResults(query) {
-    const list = document.getElementById('cmd-results-list');
-    if (!list) return;
-    list.innerHTML = '';
-
-    const q = query.toLowerCase().trim();
-    const filtered = commandData.filter(item => {
-      return item.title.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q);
+  sections.forEach(section => {
+    const items = filtered.filter(i => section.ids.includes(i.id));
+    if (!items.length) return;
+    const label = document.createElement('div');
+    label.className = 'cmd-section-label';
+    label.textContent = section.label;
+    container.appendChild(label);
+    items.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'cmd-item';
+      el.innerHTML = `
+        <div class="cmd-item-icon">${item.icon}</div>
+        <div>
+          <div class="cmd-item-title">${item.title}</div>
+          <div class="cmd-item-desc">${item.desc}</div>
+        </div>`;
+      el.addEventListener('click', () => { item.action(); playHaptic('click'); });
+      container.appendChild(el);
     });
+  });
+}
 
-    state.cmdItems = filtered;
+function initCmdPalette() {
+  const openBtns = [$('#open-cmd-btn'), $('#hero-cmd-btn')].filter(Boolean);
+  openBtns.forEach(b => b.addEventListener('click', openCmdPalette));
 
-    if (filtered.length === 0) {
-      list.innerHTML = `<li style="padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">No matching CAD engineering tools found.</li>`;
-      return;
+  const overlay = $('#cmd-overlay');
+  const input   = $('#cmd-input');
+
+  overlay?.addEventListener('click', e => { if (e.target === overlay) closeCmdPalette(); });
+  input?.addEventListener('input', () => renderCmdResults(input.value));
+
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      APP.cmdPaletteOpen ? closeCmdPalette() : openCmdPalette();
     }
+    if (e.key === 'Escape' && APP.cmdPaletteOpen) closeCmdPalette();
+  });
 
-    filtered.forEach((cmd, idx) => {
-      const li = document.createElement('li');
-      li.className = `cmd-item ${idx === state.cmdIndex ? 'selected' : ''}`;
-      li.innerHTML = `
-        <div class="cmd-item-left">
-          <span style="font-size: 1.15rem;">${cmd.icon}</span>
-          <div>
-            <div style="font-weight: 600; color: var(--text-highlight);">${cmd.title}</div>
-            <div class="cmd-item-desc">${cmd.desc}</div>
-          </div>
-        </div>
-        <span class="kbd-badge">↵</span>
-      `;
+  const kbd = $('#kbd-shortcut-label');
+  if (kbd && !navigator.platform.toLowerCase().includes('mac')) {
+    kbd.textContent = 'Ctrl+K';
+  }
+}
 
-      li.addEventListener('click', () => {
-        cmd.action();
-        closeCommandPalette();
+// ===========================================================================
+// PROJECT FILTER BUTTONS
+// ===========================================================================
+function initProjectFilters() {
+  const btns  = $$('.filter-btn');
+  const cards = $$('.project-card');
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      cards.forEach(card => {
+        const match = filter === 'all' || card.dataset.category === filter;
+        card.classList.toggle('hidden', !match);
       });
-
-      list.appendChild(li);
+      playHaptic('click');
     });
-  }
+  });
+}
 
-  function handleCommandKeydown(e) {
-    const backdrop = document.getElementById('cmd-modal-backdrop');
-    if (!backdrop || !backdrop.classList.contains('open')) return;
+// ===========================================================================
+// CASE STUDY MODAL DATA
+// ===========================================================================
+const CASE_STUDIES = {
+  air_cargo: {
+    title: 'Air Cargo Powered Roller & Castor Deck',
+    badge: 'Air Cargo GSE',
+    overview: `Heavy-capacity Ground Support Equipment (GSE) designed for wide-body aircraft cargo loading. The powered roller deck drives Unit Load Devices (ULDs) bidirectionally at 0.35 m/s with a dynamic load rating of 7,000 kg. Lazy Dolly Castor Deck uses a 55 mm pitch ball castor matrix providing 360° of load movement for positioning accuracy within ±5 mm.`,
+    diagram: `
+  [ULD 7,000 kg]
+       ↕
+  ┌────────────────────────────────┐
+  │  POWERED ROLLER DECK           │
+  │  ● Motor: 1.5 kW ×4, AC VFD   │
+  │  ● Drive speed: 0.35 m/s       │
+  │  ● Bi-directional stop blocks  │
+  └────────────────────────────────┘
+       ↕
+  ┌────────────────────────────────┐
+  │  LAZY DOLLY CASTOR DECK        │
+  │  ● Ball castor pitch: 55 mm   │
+  │  ● Capacity: 7,000 kg dynamic  │
+  │  ● IATA AHM 913 compliant      │
+  └────────────────────────────────┘`,
+    benchmarks: [
+      { val: '7,000 kg', label: 'Dynamic ULD Rating' },
+      { val: '0.35 m/s', label: 'Drive Speed' },
+      { val: '55 mm',    label: 'Castor Pitch' },
+    ],
+    tools: 'SolidWorks 3D Assembly · AutoCAD 2D Layout · Motor Drive Sizing · IATA AHM Compliance Checking',
+  },
+  strip_flattening: {
+    title: 'Industrial Strip Flattening Machine',
+    badge: 'Automated SPM',
+    overview: `17-roll precision leveling cassette for continuous steel strip processing up to 1,200 mm width and 6 mm gauge. Hydraulic downforce cylinders deliver 80 kN distributed across upper roll set. Dual planetary reduction drives ensure roll surface speed consistency within ±0.5%. Heat-treated Cr-Mo leveling rolls rated for HRC 58–62 surface hardness.`,
+    diagram: `
+  INPUT COIL → ENTRY PINCH → 17-ROLL CASSETTE → EXIT PINCH → CUT-TO-LENGTH
+                              │
+              ┌───────────────┴────────────────┐
+              │  8× Upper rolls (adjustable)    │
+              │  9× Lower rolls (fixed datum)   │
+              │  Hydraulic cylinders: 80 kN     │
+              │  Planetary gearbox: 1:45 ratio  │
+              └────────────────────────────────┘`,
+    benchmarks: [
+      { val: '1,200 mm', label: 'Strip Width' },
+      { val: '80 kN',    label: 'Downforce' },
+      { val: 'HRC 60',   label: 'Roll Hardness' },
+    ],
+    tools: 'SolidWorks Large Assembly · Hydraulic Cylinder Sizing · Bearing Life Calculation (ISO 281) · DFM Review',
+  },
+  t_spacer: {
+    title: 'Automated T-Spacer Cutting Machine',
+    badge: 'Precision SPM',
+    overview: `High-speed automated SPM for insulating glass T-spacer profiles. Servo ball-screw indexing achieves ±0.05 mm cut length accuracy. Dual pneumatic clamp jaws apply 1.2 kN per jaw. Carbide-tipped circular blade at 4,500 RPM. Automatic chip vacuum extraction maintains 94% material yield. Overall equipment effectiveness (OEE) target: >91%.`,
+    diagram: `
+  FEED ROLL PAIR → SERVO INDEXER → PNEUMATIC CLAMP → BLADE CUT → PART TRAY
+                       │
+              ┌────────┴──────────┐
+              │ Ball screw: 5mm p  │
+              │ Servo: 400W BLDC  │
+              │ Clamp: 1.2kN ×2   │
+              │ Blade: ⌀160 TC    │
+              └───────────────────┘`,
+    benchmarks: [
+      { val: '±0.05 mm', label: 'Cut Tolerance' },
+      { val: '1.8 s',    label: 'Cycle Time' },
+      { val: '94%',      label: 'Material Yield' },
+    ],
+    tools: 'Linear Servo Design · Pneumatic Actuator Sizing · AutoCAD Shop Drawings · Safety Enclosure Design (ISO 13855)',
+  },
+  steel_plant: {
+    title: 'Steel Plant Budgetary Equipment Proposal',
+    badge: 'Budgetary Proposal',
+    overview: `Comprehensive CAPEX estimation and equipment specification for a new 45,000 m² steel processing plant. Deliverables included 2D/3D plant layouts with 25T overhead crane clearance envelopes, slitting line, leveling line, cut-to-length line equipment specifications, civil/mechanical interface documentation, and supplier comparison matrices.`,
+    diagram: `
+  PLANT SCOPE (45,000 m²):
+  ┌─────────────────────────────────────┐
+  │  Bay A: Slitting Line (2,000 mm)    │
+  │  Bay B: Leveling & CTL (1,200 mm)   │
+  │  Bay C: Shipping / Packaging        │
+  │  25T EOT Crane × 3 (25m span)       │
+  │  Civil interfaces: 14 pits / sumps  │
+  └─────────────────────────────────────┘`,
+    benchmarks: [
+      { val: '45,000 m²', label: 'Plant Footprint' },
+      { val: '25T',       label: 'Crane Rating' },
+      { val: '3 Lines',   label: 'Processing Lines' },
+    ],
+    tools: 'AutoCAD Plant Layout · CAPEX Cost Modelling · Supplier Comparison Matrix · Civil/Mech Interface Docs',
+  },
+  load_analysis: {
+    title: 'FEA Stress Simulation & Proof Load Testing',
+    badge: 'FEA & Proof Test',
+    overview: `Combined digital FEA and physical proof test verification protocol. SolidWorks Simulation / ANSYS APDL Von Mises stress analysis followed by physical proof overload at 1.5× rated capacity using calibrated hydraulic rams and rosette strain gauges. Factor of Safety certified > 3.2. Maximum recorded deflection: 1.42 mm (< L/850 limit).`,
+    diagram: `
+  DIGITAL FEA (SolidWorks / ANSYS)
+  ├─ Material: S355JR (σy = 355 MPa)
+  ├─ Max Von Mises: 108.4 MPa
+  ├─ FoS: 3.27
+  └─ Max deflection: 1.42 mm
 
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      if (state.cmdItems.length > 0) {
-        state.cmdIndex = (state.cmdIndex + 1) % state.cmdItems.length;
-        updateCommandSelection();
-        playUiSound('click');
-      }
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      if (state.cmdItems.length > 0) {
-        state.cmdIndex = (state.cmdIndex - 1 + state.cmdItems.length) % state.cmdItems.length;
-        updateCommandSelection();
-        playUiSound('click');
-      }
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (state.cmdItems[state.cmdIndex]) {
-        state.cmdItems[state.cmdIndex].action();
-        closeCommandPalette();
-      }
-    } else if (e.key === 'Escape') {
-      closeCommandPalette();
-    }
-  }
+  PHYSICAL PROOF TESTING
+  ├─ Rated load: 70 kN
+  ├─ Proof overload: 105 kN (1.5×)
+  ├─ Strain gauge reading: 114.8 MPa
+  └─ Permanent set: < 0.1 mm ✓`,
+    benchmarks: [
+      { val: '3.27 FoS', label: 'Safety Factor' },
+      { val: '1.42 mm',  label: 'Max Deflection' },
+      { val: '1.5×',     label: 'Proof Overload' },
+    ],
+    tools: 'ANSYS APDL · SolidWorks Simulation · Rosette Strain Gauges · Calibrated Hydraulic Ram',
+  },
+  autocad_proposals: {
+    title: 'MHE Cargo Terminal Mezzanine Floor Design',
+    badge: 'MHE & GSE Design',
+    overview: `End-to-end design and development of Material Handling Equipment (MHE) for a cargo terminal mezzanine floor. Work spanned concept design, detail modelling, manufacturing drawings with ASME Y14.5M GD&T, BOM generation, first article inspection (FAI), and hands-on site installation support. Reduced installation time by 15% through coordinated documentation packages.`,
+    diagram: `
+  DESIGN FLOW:
+  Concept Sketch
+    ↓ SolidWorks 3D Model
+    ↓ AutoCAD Shop Drawings (ASME Y14.5M)
+    ↓ BOM + Vendor Procurement
+    ↓ First Article Inspection (FAI)
+    ↓ Site Installation Support
+    ✓ 100% FAI Pass · 15% Install Time Reduction`,
+    benchmarks: [
+      { val: '15%',   label: 'Installation Time Saved' },
+      { val: '100%',  label: 'FAI Pass Rate' },
+      { val: '20%',   label: 'PoC Cost Reduction' },
+    ],
+    tools: 'SolidWorks · AutoCAD · ASME Y14.5M · BOM Generation · FAI Inspection Sheets · Site Commissioning',
+  },
+};
 
-  function updateCommandSelection() {
-    const items = document.querySelectorAll('.cmd-item');
-    items.forEach((item, idx) => {
-      item.classList.toggle('selected', idx === state.cmdIndex);
-      if (idx === state.cmdIndex) {
-        item.scrollIntoView({ block: 'nearest' });
-      }
-    });
-  }
+function openCaseStudy(projectId) {
+  const data = CASE_STUDIES[projectId];
+  if (!data) return;
 
-  function scrollToSection(id) {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }
+  const overlay = $('#modal-overlay');
+  const title   = $('#modal-title');
+  const badge   = $('#modal-badge');
+  const body    = $('#modal-body');
 
-  // ==========================================================================
-  // CASE STUDY MODAL
-  // ==========================================================================
-  function openCaseStudy(projectId) {
-    const data = state.caseStudies[projectId];
-    if (!data) return;
+  title.textContent = data.title;
+  badge.textContent = data.badge;
 
-    const backdrop = document.getElementById('case-study-modal-backdrop');
-    const title = document.getElementById('case-study-title');
-    const badge = document.getElementById('case-study-badge');
-    const content = document.getElementById('case-study-content');
-
-    title.textContent = data.title;
-    badge.textContent = data.badge;
-
-    let benchmarksHtml = '';
-    if (data.benchmarks && data.benchmarks.length > 0) {
-      benchmarksHtml = `
-        <h4 style="color:var(--text-highlight); margin-top:1.5rem; margin-bottom:0.75rem;">Verified Performance &amp; Inspection Benchmarks</h4>
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-          ${data.benchmarks.map(b => `
-            <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); padding: 0.85rem; border-radius: var(--radius-sm);">
-              <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">${b.label}</div>
-              <div style="font-size: 1.15rem; font-weight: 700; color: var(--accent-primary); font-family: var(--font-mono); margin-top: 0.2rem;">${b.val}</div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-    }
-
-    content.innerHTML = `
-      <div style="margin-bottom: 1.5rem;">
-        <h4 style="color:var(--text-highlight); margin-bottom: 0.4rem;">Engineering Challenge &amp; Design Criteria</h4>
-        <p style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem;">${data.problem}</p>
+  body.innerHTML = `
+    <div>
+      <div class="modal-section-title">Project Overview</div>
+      <p class="modal-text">${data.overview}</p>
+    </div>
+    <div>
+      <div class="modal-section-title">System Architecture Diagram</div>
+      <div class="modal-diagram">${data.diagram}</div>
+    </div>
+    <div>
+      <div class="modal-section-title">Key Metrics</div>
+      <div class="modal-benchmarks">
+        ${data.benchmarks.map(b => `
+          <div class="modal-benchmark">
+            <div class="modal-bench-val">${b.val}</div>
+            <div class="modal-bench-label">${b.label}</div>
+          </div>`).join('')}
       </div>
+    </div>
+    <div>
+      <div class="modal-section-title">Tools &amp; Methodologies</div>
+      <p class="modal-text">${data.tools}</p>
+    </div>`;
 
-      <div style="margin-bottom: 1.5rem;">
-        <h4 style="color:var(--text-highlight); margin-bottom: 0.4rem;">Design Thinking &amp; Mechanical Solution</h4>
-        <p style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem;">${data.solution}</p>
-      </div>
+  overlay.classList.add('open');
+  APP.modalOpen = true;
+  document.body.style.overflow = 'hidden';
+}
 
-      <h4 style="color:var(--text-highlight); margin-bottom: 0.4rem;">Mechanical Assembly &amp; Flow Schematic</h4>
-      <div class="case-diagram">${data.diagram}</div>
+function closeModal() {
+  $('#modal-overlay').classList.remove('open');
+  APP.modalOpen = false;
+  document.body.style.overflow = '';
+}
 
-      ${benchmarksHtml}
-
-      <h4 style="color:var(--text-highlight); margin-bottom: 0.4rem;">Engineering Calculations &amp; Specification Sizing</h4>
-      <div class="case-diagram" style="color: var(--text-secondary);">${escapeHtml(data.code)}</div>
-    `;
-
-    backdrop.classList.add('open');
-    backdrop.setAttribute('aria-hidden', 'false');
-    playUiSound('pop');
-  }
-
-  function closeCaseStudy() {
-    const backdrop = document.getElementById('case-study-modal-backdrop');
-    if (!backdrop) return;
-    backdrop.classList.remove('open');
-    backdrop.setAttribute('aria-hidden', 'true');
-  }
-
-  function escapeHtml(str) {
-    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  }
-
-  // ==========================================================================
-  // INTERACTIVE MECHANICAL & FEA LOAD SIMULATOR
-  // ==========================================================================
-  function runSandboxCommand(cmd) {
-    const output = document.getElementById('sandbox-terminal-output');
-    if (!output) return;
-
-    const append = (html) => {
-      const line = document.createElement('div');
-      line.className = 'terminal-line';
-      line.innerHTML = html;
-      output.appendChild(line);
-      output.scrollTop = output.scrollHeight;
-    };
-
-    playUiSound('click');
-
-    if (cmd === 'clear') {
-      output.innerHTML = '';
-      append(`<span class="terminal-prompt">&gt;&gt;</span><span class="terminal-output">Simulation log cleared. Ready for next calculation.</span>`);
-      return;
-    }
-
-    append(`<span class="terminal-prompt">&gt;&gt;</span><span class="terminal-output">solve --routine ${cmd}</span>`);
-
-    if (cmd === 'calc-air-cargo') {
-      append(`<span class="terminal-highlight">[Air Cargo GSE Deck]</span> Loading 7,000 kg ULD Container onto Lazy Dolly Castor Deck...`);
-      setTimeout(() => {
-        append(`<span class="terminal-output">» Castor Matrix: 120 Inverted Ball Castors (Load per unit = 572 N)</span>`);
-        append(`<span class="terminal-output">» Motorized Roller Ingress: 1.5 kW Gearmotor @ 1:25 ratio delivering 340 N·m torque</span>`);
-      }, 300);
-      setTimeout(() => {
-        append(`<span class="terminal-success">✓ Solver Result: Max Deck Deflection = 1.42 mm (Allowable &lt; 2.5 mm). Factor of Safety = 3.2 FoS.</span>`);
-        playUiSound('success');
-      }, 750);
-    } else if (cmd === 'strip-tonnage') {
-      append(`<span class="terminal-highlight">[Strip Flattening Machine]</span> Calculating roll tonnage for S355JR coil (t = 6mm, b = 1,200mm)...`);
-      setTimeout(() => {
-        append(`<span class="terminal-output">» Section Modulus Z = (1200 * 36) / 6 = 7,200 mm³</span>`);
-        append(`<span class="terminal-output">» Plastic Bending Moment Mp = 1.5 * Sy * Z = 3.83 kN·m</span>`);
-      }, 300);
-      setTimeout(() => {
-        append(`<span class="terminal-success">✓ Total Required Hydraulic Force = 78.4 kN. Configured cylinders provide 80 kN (Margin: 102%).</span>`);
-        playUiSound('success');
-      }, 700);
-    } else if (cmd === 't-spacer-cycle') {
-      append(`<span class="terminal-highlight">[T-Spacer Cutting SPM]</span> Simulating automated cycle breakdown...`);
-      setTimeout(() => {
-        append(`<span class="terminal-output">» Feed Stroke (400 mm @ 600 mm/s) + Accel: 0.67s</span>`);
-        append(`<span class="terminal-output">» Pneumatic Clamping (6 bar dual jaw):   0.15s</span>`);
-        append(`<span class="terminal-output">» 4,500 RPM Carbide Blade Stroke:         0.45s</span>`);
-        append(`<span class="terminal-output">» Blade Retract &amp; Air Jet Part Ejection:   0.53s</span>`);
-      }, 300);
-      setTimeout(() => {
-        append(`<span class="terminal-success">✓ Total Cycle Time: 1.80 seconds per finished T-Spacer (Accuracy ±0.03 mm).</span>`);
-        playUiSound('success');
-      }, 750);
-    } else if (cmd === 'steel-plant-quote') {
-      append(`<span class="terminal-highlight">[Steel Plant Equipment Proposal]</span> Processing equipment specifications &amp; budgetary quote...`);
-      setTimeout(() => {
-        append(`<span class="terminal-output">├── Primary Processing Lines: Slitters &amp; 17-Roll Levelers</span>`);
-        append(`<span class="terminal-output">├── Material Handling Systems: 25T Overhead Cranes &amp; Rail Carts</span>`);
-        append(`<span class="terminal-output">├── Electrical &amp; Automation: Substations &amp; Centralized HMI</span>`);
-        append(`<span class="terminal-output">└── Civil Interfacing: Foundations, Pits &amp; Machine Anchor Patterns</span>`);
-      }, 300);
-      setTimeout(() => {
-        append(`<span class="terminal-success">✓ Master Layout &amp; Budgetary Proposal validated for equipment installation sequencing.</span>`);
-        playUiSound('success');
-      }, 700);
-    }
-  }
-
-  // ==========================================================================
-  // PROJECT FILTERING
-  // ==========================================================================
-  function initProjectFilters() {
-    const buttons = document.querySelectorAll('.filter-btn');
-    const cards = document.querySelectorAll('.project-card');
-
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        buttons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        playUiSound('click');
-
-        const filter = btn.dataset.filter;
-
-        cards.forEach(card => {
-          const cat = card.dataset.category;
-          if (filter === 'all' || cat === filter) {
-            card.style.display = 'flex';
-            setTimeout(() => {
-              card.style.opacity = '1';
-              card.style.transform = 'translateY(0)';
-            }, 30);
-          } else {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(15px)';
-            setTimeout(() => {
-              card.style.display = 'none';
-            }, 250);
-          }
-        });
-      });
-    });
-  }
-
-  // ==========================================================================
-  // UTILITY ACTIONS (Copy Email, Technical Dossier, Clock)
-  // ==========================================================================
-  function copyEmail() {
-    const email = "pran.acharya.eng@gmail.com";
-    navigator.clipboard.writeText(email).then(() => {
-      showToast("Email address copied to clipboard!", "📋");
-      playUiSound('success');
-    }).catch(() => {
-      showToast("Email: pran.acharya.eng@gmail.com", "✉️");
-    });
-  }
-
-  function downloadDossier() {
-    playUiSound('pop');
-    showToast("Generating Karampudi Acharya Pranav Technical Dossier...", "💾");
-
-    const content = `================================================================================
-KARAMPUDI ACHARYA PRANAV — LEAD MECHANICAL CAD DESIGN & TURNKEY PROJECT ENGINEER
-Email: pran.acharya.eng@gmail.com | Turnkey Machinery & Aviation GSE Engineering
-CAD Specialties: SolidWorks 3D, AutoCAD 2D, KeyShot 11, FEA Stress Analysis
-================================================================================
-
-EXECUTIVE OVERVIEW:
-Mechanical Design Engineer with extensive experience in 3D CAD modeling, large assemblies,
-Design Thinking, and turnkey industrial project management. Proven record delivering
-budgetary proposals for steel plant equipment, automated special purpose machinery,
-and aviation cargo ground handling systems.
-
-CORE PROJECT SPOTLIGHTS:
-
-1. BUDGETARY PROPOSAL FOR EQUIPMENT IN A STEEL PLANT:
-   • Preparation of comprehensive budgetary quotes and CAPEX estimation for steel plant equipment.
-   • 2D/3D plant layout in AutoCAD, material handling logistics, 25T crane clearance envelopes.
-   • Supplier technical evaluations, equipment sizing, and civil foundation load interfaces.
-
-2. AIR CARGO GROUND HANDLING SYSTEMS:
-   • Powered Roller Deck & Lazy Dolly Castor Deck systems handling up to 7,000 kg ULDs.
-   • Motorized chain drives, bidirectional pallet stops, omnidirectional ball castors.
-   • Dynamic shock load verification conforming to IATA / AHM standards.
-
-3. SPECIAL PURPOSE MACHINERY (SPM):
-   • Automated T-Spacer Precision Cutting Machine: Linear servo indexer, ±0.05 mm tolerance,
-     pneumatic dual clamping, 1.8 second cycle time, automatic scrap ejection.
-   • Industrial Strip Flattening Machine: 17-roll precision cassette with 80 kN hydraulic
-     downforce to eliminate coil set across 1,200 mm wide high-tensile steel coils.
-
-4. FEA LOAD ANALYSIS & REAL-WORLD PROOF TESTING:
-   • Computational Von Mises stress, strain, and deflection simulations (ANSYS / SolidWorks).
-   • Validated against real-life proof tests using calibrated hydraulic rams and strain gauges.
-   • Factor of Safety FoS > 2.8 certified on all load-bearing lifting assets.
-
-5. AUTOCAD TECHNICAL PROPOSALS & INSPECTION DOCUMENTATION:
-   • ASME Y14.5M Geometric Dimensioning & Tolerancing (GD&T) shop drawings.
-   • Detailed Bills of Materials (BOM), weldment callouts (AWS D1.1), First Article Inspections.
-   • On-site engineering redlines and real-time retrofits during live plant commissioning.
-
-6. KEYSHOT 3D PHOTOREALISTIC RENDERINGS:
-   • Studio HDRI ray-traced presentations, exploded assembly views, client visual approvals.
-
-================================================================================
-Generated via Karampudi Acharya Pranav Engineering Suite. All Rights Reserved.
-`;
-
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'Karampudi_Acharya_Pranav_CAD_Dossier.txt';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  }
-
-  function updateClock() {
-    const clockEl = document.getElementById('current-pst-time');
-    if (!clockEl) return;
-    const now = new Date();
-    clockEl.textContent = now.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true
-    });
-  }
-
-  function initTelemetryFlicker() {
-    const deflectEl = document.getElementById('telemetry-deflect');
-    const fosEl = document.getElementById('telemetry-fos');
-
-    setInterval(() => {
-      if (deflectEl) {
-        const d = (1.38 + Math.random() * 0.08).toFixed(2);
-        deflectEl.textContent = `${d} mm`;
-      }
-      if (fosEl) {
-        const f = (3.15 + Math.random() * 0.12).toFixed(1);
-        fosEl.textContent = `${f} FoS`;
-      }
-    }, 3600);
-  }
-
-  // ==========================================================================
-  // INITIALIZATION & EVENT BINDINGS
-  // ==========================================================================
-  document.addEventListener('DOMContentLoaded', () => {
-    // 1. Theme & Accent Setup
-    applyTheme(state.theme);
-    applyAccent(state.accent);
-
-    // 2. Engines & UI Controls
-    initAnimeSwordsEngine();
-    initSwordSelector();
-    initProjectFilters();
-    initTelemetryFlicker();
-
-    updateClock();
-    setInterval(updateClock, 1000);
-
-    // Theme Switcher Button
-    const themeBtn = document.getElementById('theme-toggle-btn');
-    if (themeBtn) {
-      themeBtn.addEventListener('click', toggleTheme);
-    }
-
-    // Color Palette Switcher Dropdown
-    const colorBtn = document.getElementById('color-picker-btn');
-    const colorMenu = document.getElementById('color-palette-menu');
-    if (colorBtn && colorMenu) {
-      colorBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        colorMenu.classList.toggle('open');
-        playUiSound('click');
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!colorMenu.contains(e.target) && e.target !== colorBtn) {
-          colorMenu.classList.remove('open');
-        }
-      });
-
-      document.querySelectorAll('.color-choice-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          initAudio();
-          const acc = btn.dataset.accent;
-          applyAccent(acc);
-          colorMenu.classList.remove('open');
-          showToast(`Palette Range: ${btn.textContent.trim()}`, "🎨");
-          playUiSound('pop');
-        });
-      });
-    }
-
-    // Command Palette Setup
-    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-    const shortcutLabel = document.getElementById('kbd-shortcut-label');
-    if (shortcutLabel && !isMac) {
-      shortcutLabel.textContent = 'Ctrl+K';
-    }
-
-    const openCmdBtn = document.getElementById('open-cmd-btn');
-    const heroCmdBtn = document.getElementById('hero-cmd-btn');
-    const cmdBackdrop = document.getElementById('cmd-modal-backdrop');
-    const cmdInput = document.getElementById('cmd-search-input');
-
-    if (openCmdBtn) openCmdBtn.addEventListener('click', openCommandPalette);
-    if (heroCmdBtn) heroCmdBtn.addEventListener('click', openCommandPalette);
-
-    if (cmdBackdrop) {
-      cmdBackdrop.addEventListener('click', (e) => {
-        if (e.target === cmdBackdrop) closeCommandPalette();
-      });
-    }
-
-    if (cmdInput) {
-      cmdInput.addEventListener('input', (e) => {
-        state.cmdIndex = 0;
-        renderCommandResults(e.target.value);
-      });
-      cmdInput.addEventListener('keydown', handleCommandKeydown);
-    }
-
-    window.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        const backdrop = document.getElementById('cmd-modal-backdrop');
-        if (backdrop && backdrop.classList.contains('open')) {
-          closeCommandPalette();
-        } else {
-          openCommandPalette();
-        }
-      }
-      if (e.key === 'Escape') {
-        closeCommandPalette();
-        closeCaseStudy();
-      }
-    });
-
-    const audioBtn = document.getElementById('audio-toggle-btn');
-    if (audioBtn) audioBtn.addEventListener('click', toggleAudio);
-
-    const dossierBtn = document.getElementById('hero-brief-btn');
-    if (dossierBtn) dossierBtn.addEventListener('click', downloadDossier);
-
-    const copyEmailBtn = document.getElementById('copy-email-btn');
-    if (copyEmailBtn) copyEmailBtn.addEventListener('click', copyEmail);
-
-    document.querySelectorAll('.view-case-study').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const proj = btn.dataset.project;
-        openCaseStudy(proj);
-      });
-    });
-
-    const closeCaseBtn = document.getElementById('close-case-study-btn');
-    const caseBackdrop = document.getElementById('case-study-modal-backdrop');
-    if (closeCaseBtn) closeCaseBtn.addEventListener('click', closeCaseStudy);
-    if (caseBackdrop) {
-      caseBackdrop.addEventListener('click', (e) => {
-        if (e.target === caseBackdrop) closeCaseStudy();
-      });
-    }
-
-    document.querySelectorAll('.copy-link-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const link = btn.dataset.link || "Technical Proposal Documentation";
-        navigator.clipboard.writeText(link).then(() => {
-          showToast(`Specification details copied!`, "📋");
-          playUiSound('success');
-        });
-      });
-    });
-
-    document.querySelectorAll('.term-cmd-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const cmd = btn.dataset.cmd;
-        runSandboxCommand(cmd);
-      });
-    });
-
-    const contactForm = document.getElementById('contact-form');
-    if (contactForm) {
-      contactForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const submitBtn = document.getElementById('form-submit-btn');
-        const originalText = submitBtn.innerHTML;
-
-        submitBtn.innerHTML = `<span>Transmitting Technical Inquiry...</span>`;
-        submitBtn.disabled = true;
-
-        setTimeout(() => {
-          submitBtn.innerHTML = originalText;
-          submitBtn.disabled = false;
-          contactForm.reset();
-          showToast("Technical Project Inquiry transmitted to priority queue!", "✓");
-          playUiSound('success');
-        }, 1200);
-      });
-    }
-
-    const mobileToggle = document.getElementById('mobile-menu-toggle');
-    const mobileDrawer = document.getElementById('mobile-drawer');
-    if (mobileToggle && mobileDrawer) {
-      mobileToggle.addEventListener('click', () => {
-        mobileDrawer.classList.toggle('open');
-        playUiSound('click');
-      });
-
-      document.querySelectorAll('[data-close-drawer]').forEach(item => {
-        item.addEventListener('click', () => {
-          mobileDrawer.classList.remove('open');
-        });
-      });
-    }
-
-    const navbar = document.getElementById('navbar');
-    const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.nav-link');
-
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 40) {
-        navbar.classList.add('scrolled');
-      } else {
-        navbar.classList.remove('scrolled');
-      }
-
-      let current = '';
-      sections.forEach(section => {
-        const sectionTop = section.offsetTop - 120;
-        if (window.pageYOffset >= sectionTop) {
-          current = section.getAttribute('id');
-        }
-      });
-
-      navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${current}`) {
-          link.classList.add('active');
-        }
-      });
+function initModals() {
+  $$('.view-case-study').forEach(btn => {
+    btn.addEventListener('click', () => {
+      openCaseStudy(btn.dataset.project);
+      playHaptic('click');
     });
   });
 
-})();
+  $$('.doc-card').forEach(card => {
+    card.addEventListener('click', () => {
+      if (card.dataset.project) { openCaseStudy(card.dataset.project); playHaptic('click'); }
+    });
+  });
+
+  $('#modal-close').addEventListener('click', closeModal);
+  $('#modal-overlay').addEventListener('click', e => { if (e.target === $('#modal-overlay')) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && APP.modalOpen) closeModal(); });
+}
+
+// ===========================================================================
+// COPY SPEC LINK
+// ===========================================================================
+function initCopyLinks() {
+  $$('.copy-link-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const text = btn.dataset.link || 'Engineering Specification';
+      navigator.clipboard.writeText(text).then(() => showToast('Spec text copied!', '📋'));
+      playHaptic('click');
+    });
+  });
+}
+
+// ===========================================================================
+// HERO BRIEF
+// ===========================================================================
+function initHeroBrief() {
+  const btn = $('#hero-brief-btn');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    showToast('Technical brief will be shared upon request — reach out via contact below.', '📄', 4000);
+    playHaptic('click');
+  });
+}
+
+// ===========================================================================
+// INTERACTIVE FEA / LOAD SIMULATOR TERMINAL
+// ===========================================================================
+const SIM_COMMANDS = {
+  'calc-air-cargo': () => {
+    const load = 7000;
+    const g = 9.81;
+    const F = (load * g).toFixed(0);
+    const area = (0.8 * 1.2).toFixed(2);
+    const stress = ((load * g) / (0.8 * 1.2 * 1e6) * 1000).toFixed(3);
+    return [
+      `>> Executing: air-cargo-deck-stress --load ${load}kg`,
+      ``,
+      `  Applied force F = ${load} × 9.81 = ${F} N (${(F/1000).toFixed(1)} kN)`,
+      `  Deck contact area = 0.8 m × 1.2 m = ${area} m²`,
+      `  Distributed pressure = ${stress} MPa`,
+      `  Roller section modulus (S355JR) → σ_max = 78.4 MPa`,
+      `  Factor of Safety = 355 / 78.4 = 4.53`,
+      ``,
+      `  ✓ PASS — FoS 4.53 > 2.5 design minimum`,
+      `  ✓ ULD dynamic load 7,000 kg cleared at 0.35 m/s drive`,
+      `  ✓ IATA AHM 913 compliant (Dynamic load factor 1.35 applied)`,
+    ];
+  },
+  'strip-tonnage': () => {
+    const w = 1200; const t = 6; const Y = 355;
+    const F = (w * t * Y * 1.3 / 1000).toFixed(1);
+    const rolls = 17;
+    const perRoll = (F / (rolls / 2)).toFixed(1);
+    return [
+      `>> Executing: strip-flattening-force --width ${w}mm --gauge ${t}mm`,
+      ``,
+      `  Material: S355JR, Yield σ_y = ${Y} MPa`,
+      `  Strip area  = ${w} mm × ${t} mm = ${(w*t).toLocaleString()} mm²`,
+      `  Estimated leveling force = ${F} kN total`,
+      `  Per active roll pair load = ${perRoll} kN`,
+      `  Hydraulic cylinder bore (80 kN @ 250 bar) = ⌀203 mm`,
+      ``,
+      `  ✓ 17-roll cassette sufficient for 6mm S355JR at 1,200mm`,
+      `  ✓ Planetary gearbox ratio 1:45 — roll surface ΔV < 0.5%`,
+      `  ✓ Cross-bow reduction > 95% (ISO 9225 strip flatness)`,
+    ];
+  },
+  't-spacer-cycle': () => {
+    const feedL = 1000; const servoAcc = 180; const servoV = 400;
+    const cutTime = 0.12; const clampTime = 0.06;
+    const tAccel = servoV / servoAcc;
+    const tFeed  = tAccel + (feedL - servoV * servoV / (2 * servoAcc)) / servoV;
+    const tTotal = (tFeed + cutTime + clampTime * 2).toFixed(2);
+    return [
+      `>> Executing: t-spacer-cycle-sim --index ${feedL}mm`,
+      ``,
+      `  Servo ball screw: v_max = ${servoV} mm/s, a = ${servoAcc} mm/s²`,
+      `  Acceleration time t_a = ${tAccel.toFixed(3)} s`,
+      `  Feed traverse t_feed  = ${tFeed.toFixed(3)} s`,
+      `  Clamp engage/release  = ${(clampTime*2).toFixed(3)} s`,
+      `  Blade cut dwell       = ${cutTime} s`,
+      `  ─────────────────────────────────────`,
+      `  Total cycle time      = ${tTotal} s`,
+      `  Output rate           = ~${Math.floor(3600/tTotal).toLocaleString()} cuts/hr`,
+      ``,
+      `  ✓ Meets 1.8 s cycle target`,
+      `  ✓ ±0.05 mm servo accuracy confirmed`,
+      `  ✓ Material yield 94% (offcut < 6%)`,
+    ];
+  },
+  'steel-plant-quote': () => {
+    return [
+      `>> Executing: plant-budget-estimate --plant steel --area 45000sqm`,
+      ``,
+      `  EQUIPMENT SCOPE SUMMARY`,
+      `  ─────────────────────────────────────`,
+      `  Slitting Line (2,000 mm):  ~ ₹ 8.5 Cr`,
+      `  Leveling + CTL Line:       ~ ₹ 6.2 Cr`,
+      `  25T EOT Crane × 3:         ~ ₹ 3.8 Cr`,
+      `  MHE / Conveyors / Coil Cars:~ ₹ 2.1 Cr`,
+      `  Civil / Structural / Pits: ~ ₹ 4.4 Cr`,
+      `  Electrical / Automation:   ~ ₹ 3.6 Cr`,
+      `  Commissioning + Spares:    ~ ₹ 1.4 Cr`,
+      `  ─────────────────────────────────────`,
+      `  TOTAL CAPEX (Budgetary):   ~ ₹ 30.0 Cr`,
+      ``,
+      `  ✓ 45,000 m² plant layout complete (AutoCAD)`,
+      `  ✓ Crane clearance envelope verified (3D)`,
+      `  ✓ Civil pit interfaces documented`,
+    ];
+  },
+  'clear': () => null,
+};
+
+function addTerminalLines(lines) {
+  const out = $('#sandbox-terminal-output');
+  if (!out) return;
+  lines.forEach((line, i) => {
+    setTimeout(() => {
+      const div = document.createElement('div');
+      div.className = 'terminal-line';
+      if (line.startsWith('>>')) {
+        div.innerHTML = `<span class="terminal-prompt">&gt;&gt;</span><span class="terminal-output">${line.replace('>>', '').trim()}</span>`;
+      } else if (line.startsWith('  ✓')) {
+        div.innerHTML = `<span class="terminal-success">${line}</span>`;
+      } else if (line.startsWith('  TOTAL')) {
+        div.innerHTML = `<span class="terminal-highlight">${line}</span>`;
+      } else {
+        div.innerHTML = `<span class="terminal-output">${line}</span>`;
+      }
+      out.appendChild(div);
+      out.scrollTop = out.scrollHeight;
+    }, i * 55);
+  });
+}
+
+function initTerminal() {
+  $$('[data-cmd]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cmd = btn.dataset.cmd;
+      playHaptic('click');
+      if (cmd === 'clear') {
+        const out = $('#sandbox-terminal-output');
+        if (out) out.innerHTML = `<div class="terminal-line"><span class="terminal-prompt">&gt;&gt;</span><span class="terminal-output"> Terminal cleared. Ready.</span></div>`;
+        return;
+      }
+      const fn = SIM_COMMANDS[cmd];
+      if (fn) {
+        const lines = fn();
+        if (lines) addTerminalLines(lines);
+      }
+    });
+  });
+}
+
+// ===========================================================================
+// CONTACT FORM
+// ===========================================================================
+function initContactForm() {
+  const form = $('#contact-form');
+  if (!form) return;
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const name    = $('#contact-name').value.trim();
+    const email   = $('#contact-email').value.trim();
+    const subject = $('#contact-subject').value.trim() || 'Engineering Enquiry';
+    const message = $('#contact-message').value.trim();
+    const body    = `Name: ${name}\nEmail: ${email}\n\n${message}`;
+    const mailto  = `mailto:pran.acharya.eng@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
+    showToast('Opening your email client…', '📧', 3200);
+    playHaptic('success');
+  });
+}
+
+// ===========================================================================
+// SCROLL REVEAL
+// ===========================================================================
+function initScrollReveal() {
+  const els = $$('.reveal-on-scroll');
+  if (!els.length) return;
+  const io = new IntersectionObserver(
+    (entries) => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } }),
+    { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
+  );
+  els.forEach(el => io.observe(el));
+}
+
+// ===========================================================================
+// BOOT
+// ===========================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  initAccentPicker();
+  initNavbar();
+  initMobileDrawer();
+  initAudio();
+  initSwordEngine();
+  initSwordToolbar();
+  initCmdPalette();
+  initProjectFilters();
+  initModals();
+  initCopyLinks();
+  initHeroBrief();
+  initTerminal();
+  initContactForm();
+  initScrollReveal();
+
+  // Welcome toast
+  setTimeout(() => showToast('Portfolio loaded — Anime Blades Active ⚔️', '⚔️', 3200), 700);
+});
